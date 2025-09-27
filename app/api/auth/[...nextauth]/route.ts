@@ -13,6 +13,7 @@ const users = [
 ];
 
 export const authOptions = {
+  secret: process.env.NEXTAUTH_SECRET || "tu_clave_secreta_temporal",
   providers: [
     CredentialsProvider({
       name: "Credentials",
