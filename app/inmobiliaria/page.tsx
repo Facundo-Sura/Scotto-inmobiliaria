@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // Datos de ejemplo para propiedades
 const PROPIEDADES_EJEMPLO = [
@@ -128,9 +129,11 @@ export default function InmobiliariaPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {propiedadesFiltradas.map((propiedad) => (
                 <div key={propiedad.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
-                  <img 
+                  <Image 
                     src={propiedad.imagen} 
-                    alt={propiedad.titulo} 
+                    alt={propiedad.titulo}
+                    width={500}
+                    height={300}
                     className="w-full h-48 object-cover"
                   />
                   <div className="p-6">

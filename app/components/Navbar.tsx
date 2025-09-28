@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -10,7 +10,6 @@ export default function Navbar() {
   
   // Determinar si estamos en la sección inmobiliaria o martillero
   const isRealEstate = pathname.startsWith('/inmobiliaria') || pathname === '/';
-  const isAuctioneer = pathname.startsWith('/martillero');
   
   // Colores según la sección
   const primaryColor = isRealEstate ? 'bg-red-600' : 'bg-blue-600';

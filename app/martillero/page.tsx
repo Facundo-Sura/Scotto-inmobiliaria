@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // Datos de ejemplo para vehículos
 const VEHICULOS_EJEMPLO = [
@@ -139,9 +140,11 @@ export default function MartilleroPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {vehiculosFiltrados.map((vehiculo) => (
                 <div key={vehiculo.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
-                  <img 
+                  <Image 
                     src={vehiculo.imagen} 
-                    alt={vehiculo.titulo} 
+                    alt={vehiculo.titulo}
+                    width={500}
+                    height={300}
                     className="w-full h-48 object-cover"
                   />
                   <div className="p-6">

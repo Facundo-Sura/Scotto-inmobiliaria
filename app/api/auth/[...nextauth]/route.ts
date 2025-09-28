@@ -13,10 +13,11 @@ const users = [
   },
 ];
 
-export const authOptions = {
+// Definimos las opciones de autenticación pero no las exportamos directamente
+const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET || "b8764d44c9570edfc852ba899d1fdcdb",
   debug: process.env.NODE_ENV === 'development',
-  trustHost: true,
+  // trustHost: true, // Removed – not a valid property in AuthOptions
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -50,15 +51,15 @@ export const authOptions = {
     signIn: "/login",
   },
   callbacks: {
-    async jwt({ token, user }: { token: Record<string, unknown>; user?: { id: string; name: string; email: string } }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
       }
       return token;
     },
-    async session({ session, token }: { session: { user?: { id?: string } }; token: { id?: string } }) {
+    async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id;
+        (session.user as { id?: string }).id = token.id as string;
       }
       return session;
     },
@@ -69,6 +70,6 @@ export const authOptions = {
   },
 };
 
-const handler = NextAuth(authOptions as unknown as NextAuthOptions);
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
