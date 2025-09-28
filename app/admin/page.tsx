@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 // Componente de protección para rutas de administrador
 function AdminProtected({ children }: { children: React.ReactNode }) {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   
   if (status === 'loading') {

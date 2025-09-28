@@ -50,13 +50,13 @@ export const authOptions = {
     signIn: "/login",
   },
   callbacks: {
-    async jwt({ token, user }: { token: any; user?: any }) {
+    async jwt({ token, user }: { token: Record<string, unknown>; user?: { id: string; name: string; email: string } }) {
       if (user) {
         token.id = user.id;
       }
       return token;
     },
-    async session({ session, token }: { session: any; token: any }) {
+    async session({ session, token }: { session: { user?: { id?: string } }; token: { id?: string } }) {
       if (session.user) {
         session.user.id = token.id;
       }
@@ -69,6 +69,6 @@ export const authOptions = {
   },
 };
 
-const handler = NextAuth(authOptions as NextAuthOptions);
+const handler = NextAuth(authOptions as unknown as NextAuthOptions);
 
 export { handler as GET, handler as POST };
