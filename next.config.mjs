@@ -3,9 +3,8 @@ const nextConfig = {
   output: 'standalone',
   images: {
     domains: ['images.unsplash.com'],
-    unoptimized: true
-  },
-  swcMinify: true
+    unoptimized: true,
+  }
 };
 
 export default nextConfig;

@@ -17,21 +17,26 @@ export default function LoginPage() {
     setError('');
 
     try {
+      console.log('Intentando iniciar sesión con:', { email });
       const result = await signIn('credentials', {
         redirect: false,
         email,
         password,
+        callbackUrl: '/admin'
       });
 
+      console.log('Resultado de autenticación:', result);
+
       if (result?.error) {
-        setError('Credenciales inválidas');
+        setError('Credenciales inválidas. Por favor, intente con admin@scottoinmobiliaria.com / admin123');
         setLoading(false);
         return;
       }
 
       router.push('/admin');
     } catch (error) {
-      setError('Ocurrió un error al iniciar sesión');
+      console.error('Error de inicio de sesión:', error);
+      setError('Ocurrió un error al iniciar sesión. Por favor, intente nuevamente.');
       setLoading(false);
     }
   };

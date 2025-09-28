@@ -40,8 +40,8 @@ export default function Navbar() {
             <Link href="/martillero" className={`${textColor} px-3 py-2 rounded-md text-sm font-medium ${pathname === '/martillero' ? 'bg-black' : hoverColor}`}>
               Martillero
             </Link>
-            <Link href="/contacto" className={`${textColor} px-3 py-2 rounded-md text-sm font-medium ${pathname === '/contacto' ? 'bg-black' : hoverColor}`}>
-              Contacto
+            <Link href="/acerca-de-mi" className={`${textColor} px-3 py-2 rounded-md text-sm font-medium ${pathname === '/acerca-de-mi' ? 'bg-black' : hoverColor}`}>
+              Acerca de mí
             </Link>
           </div>
           
@@ -102,8 +102,8 @@ export default function Navbar() {
           <Link href="/martillero" className={`${textColor} block px-3 py-2 rounded-md text-base font-medium ${pathname === '/martillero' ? 'bg-black' : hoverColor}`}>
             Martillero
           </Link>
-          <Link href="/contacto" className={`${textColor} block px-3 py-2 rounded-md text-base font-medium ${pathname === '/contacto' ? 'bg-black' : hoverColor}`}>
-            Contacto
+          <Link href="/acerca-de-mi" className={`${textColor} block px-3 py-2 rounded-md text-base font-medium ${pathname === '/acerca-de-mi' ? 'bg-black' : hoverColor}`}>
+            Acerca de mí
           </Link>
         </div>
       </div>

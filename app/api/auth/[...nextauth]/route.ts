@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { NextAuthOptions } from "next-auth";
 
 // Este es un usuario hardcodeado para demostración
 // En producción, esto debería estar en una base de datos
@@ -13,7 +14,9 @@ const users = [
 ];
 
 export const authOptions = {
-  secret: process.env.NEXTAUTH_SECRET || "tu_clave_secreta_temporal",
+  secret: process.env.NEXTAUTH_SECRET || "b8764d44c9570edfc852ba899d1fdcdb",
+  debug: process.env.NODE_ENV === 'development',
+  trustHost: true,
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -23,10 +26,12 @@ export const authOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
+          console.log("Credenciales incompletas");
           return null;
         }
 
         const user = users.find((user) => user.email === credentials.email);
+        console.log("Usuario encontrado:", user ? "Sí" : "No");
 
         if (user && user.password === credentials.password) {
           return {
@@ -36,6 +41,7 @@ export const authOptions = {
           };
         }
 
+        console.log("Contraseña incorrecta");
         return null;
       },
     }),
@@ -44,25 +50,25 @@ export const authOptions = {
     signIn: "/login",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: any; user?: any }) {
       if (user) {
         token.id = user.id;
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: { session: any; token: any }) {
       if (session.user) {
         session.user.id = token.id;
       }
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET || "tu-secreto-temporal-para-desarrollo",
+  // secret already defined above
   session: {
     strategy: "jwt",
   },
 };
 
-const handler = NextAuth(authOptions);
+const handler = NextAuth(authOptions as NextAuthOptions);
 
 export { handler as GET, handler as POST };

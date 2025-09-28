@@ -55,8 +55,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/contacto" className="text-sm hover:underline">
-                  Contacto
+                <Link href="/acerca-de-mi" className="text-sm hover:underline">
+                  Acerca de mí
                 </Link>
               </li>
             </ul>
