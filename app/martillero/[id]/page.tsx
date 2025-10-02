@@ -130,14 +130,12 @@ const VEHICULOS_EJEMPLO = [
   }
 ];
 
-type VehiculoDetailPageProps = {
-  params: {
-    id: string;
-  };
-  searchParams?: { [key: string]: string | string[] | undefined };
+// Definición de tipos para los parámetros de la página
+type Params = {
+  id: string;
 }
 
-export default function VehiculoDetailPage({ params }: VehiculoDetailPageProps) {
+export default function VehiculoDetailPage({ params }: { params: Params }) {
   const vehiculoId = parseInt(params.id);
   const vehiculo = VEHICULOS_EJEMPLO.find(v => v.id === vehiculoId);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
