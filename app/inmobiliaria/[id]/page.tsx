@@ -114,10 +114,11 @@ const PROPIEDADES_EJEMPLO = [
   }
 ];
 
-interface PropiedadDetailPageProps {
+type PropiedadDetailPageProps = {
   params: {
     id: string;
   };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
 export default function PropiedadDetailPage({ params }: PropiedadDetailPageProps) {

@@ -130,10 +130,11 @@ const VEHICULOS_EJEMPLO = [
   }
 ];
 
-interface VehiculoDetailPageProps {
+type VehiculoDetailPageProps = {
   params: {
     id: string;
   };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
 export default function VehiculoDetailPage({ params }: VehiculoDetailPageProps) {
