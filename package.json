@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "start": "next start"
+    "dev": "run dev",
+    "build": "run build",
+    "start": "run start"
   },
   "dependencies": {
     "next": "15.5.4",
