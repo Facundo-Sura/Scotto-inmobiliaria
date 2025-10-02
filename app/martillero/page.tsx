@@ -171,7 +171,7 @@ export default function MartilleroPage() {
                       <span className="text-xl font-bold text-blue-600">
                         ${vehiculo.precio.toLocaleString()}
                       </span>
-                      <Link href={`/martillero/vehiculo/${vehiculo.id}`} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                      <Link href={`/martillero/${vehiculo.id}`} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
                         Ver detalles
                       </Link>
                     </div>

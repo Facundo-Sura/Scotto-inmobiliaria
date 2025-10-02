@@ -67,8 +67,8 @@ export default function Footer() {
             <address className="not-italic text-sm">
               <p>Alta Gracia, Córdoba</p>
               <p>Argentina</p>
-              <p className="mt-2">Email: info@scottoinmobiliaria.com</p>
-              <p>Teléfono: +54 XXX XXX XXXX</p>
+              <p className="mt-2">Email: inmobiliariascotto@hotmail.com</p>
+              <p>Teléfono: +54 3547 570838</p>
             </address>
           </div>
         </div>

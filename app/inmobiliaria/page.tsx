@@ -159,7 +159,7 @@ export default function InmobiliariaPage() {
                           ? `$${propiedad.precio.toLocaleString()}` 
                           : `$${propiedad.precio.toLocaleString()}/mes`}
                       </span>
-                      <Link href={`/inmobiliaria/propiedad/${propiedad.id}`} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                      <Link href={`/inmobiliaria/${propiedad.id}`} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
                         Ver detalles
                       </Link>
                     </div>
