@@ -116,11 +116,11 @@ const PROPIEDADES_EJEMPLO = [
 
 // Definición de tipos para los parámetros de la página
 type Params = {
-  id: string;
+  id: number;
 }
 
 export default function PropiedadDetailPage({ params }: { params: Params }) {
-  const propiedadId = parseInt(params.id);
+  const propiedadId = params.id;
   const propiedad = PROPIEDADES_EJEMPLO.find(p => p.id === propiedadId);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
