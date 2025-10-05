@@ -1,164 +1,136 @@
-'use client';
-
-import React, { useState } from 'react';
+"use client"
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import ImageCarousel from '../../../components/ImageCarousel';
 
-// Datos de ejemplo para vehículos (mismo que en la página principal)
-const VEHICULOS_EJEMPLO = [
-  {
-    id: 1,
-    titulo: 'Toyota Corolla 2019',
-    descripcion: 'Excelente estado, único dueño, service oficial',
-    precio: 15000,
-    tipo: 'auto',
-    marca: 'Toyota',
-    modelo: 'Corolla',
-    año: 2019,
-    kilometraje: 45000,
-    caracteristicas: ['Motor 1.8', 'Automático', 'Nafta', 'Full', 'Climatizador'],
-    imagen: 'https://placehold.co/600x400/blue/white?text=Toyota+Corolla',
-    imagenes: [
-      'https://placehold.co/600x400/blue/white?text=Toyota+Corolla+1',
-      'https://placehold.co/600x400/blue/white?text=Toyota+Corolla+2',
-      'https://placehold.co/600x400/blue/white?text=Toyota+Corolla+3',
-      'https://placehold.co/600x400/blue/white?text=Toyota+Corolla+4'
-    ],
-    detalles: {
-      combustible: 'Nafta',
-      transmision: 'Automática',
-      motor: '1.8L',
-      cilindrada: '1800cc',
-      potencia: '140 HP',
-      traccion: 'Delantera',
-      color: 'Blanco',
-      puertas: 4,
-      asientos: 5,
-      equipamiento: ['Aire acondicionado', 'Dirección asistida', 'Cierre centralizado', 'Alarma', 'Radio CD', 'Llantas de aleación']
-    }
-  },
-  {
-    id: 2,
-    titulo: 'Ford Ranger 2018',
-    descripcion: 'Camioneta en perfecto estado, 4x4, diesel',
-    precio: 25000,
-    tipo: 'camioneta',
-    marca: 'Ford',
-    modelo: 'Ranger',
-    año: 2018,
-    kilometraje: 60000,
-    caracteristicas: ['Motor 3.2', 'Manual', 'Diesel', '4x4', 'Cuero'],
-    imagen: 'https://placehold.co/600x400/blue/white?text=Ford+Ranger',
-    imagenes: [
-      'https://placehold.co/600x400/blue/white?text=Ford+Ranger+1',
-      'https://placehold.co/600x400/blue/white?text=Ford+Ranger+2',
-      'https://placehold.co/600x400/blue/white?text=Ford+Ranger+3'
-    ],
-    detalles: {
-      combustible: 'Diesel',
-      transmision: 'Manual',
-      motor: '3.2L',
-      cilindrada: '3200cc',
-      potencia: '200 HP',
-      traccion: '4x4',
-      color: 'Gris',
-      puertas: 4,
-      asientos: 5,
-      equipamiento: ['Aire acondicionado', 'Dirección asistida', 'Asientos de cuero', 'Barra antivuelco', 'Lona marinera', 'Enganche']
-    }
-  },
-  {
-    id: 3,
-    titulo: 'Volkswagen Gol 2020',
-    descripcion: 'Económico, bajo consumo, ideal primer auto',
-    precio: 10000,
-    tipo: 'auto',
-    marca: 'Volkswagen',
-    modelo: 'Gol',
-    año: 2020,
-    kilometraje: 30000,
-    caracteristicas: ['Motor 1.6', 'Manual', 'Nafta', 'Aire acondicionado'],
-    imagen: 'https://placehold.co/600x400/blue/white?text=Volkswagen+Gol',
-    imagenes: [
-      'https://placehold.co/600x400/blue/white?text=Volkswagen+Gol+1',
-      'https://placehold.co/600x400/blue/white?text=Volkswagen+Gol+2',
-      'https://placehold.co/600x400/blue/white?text=Volkswagen+Gol+3'
-    ],
-    detalles: {
-      combustible: 'Nafta',
-      transmision: 'Manual',
-      motor: '1.6L',
-      cilindrada: '1600cc',
-      potencia: '110 HP',
-      traccion: 'Delantera',
-      color: 'Rojo',
-      puertas: 5,
-      asientos: 5,
-      equipamiento: ['Aire acondicionado', 'Dirección asistida', 'Cierre centralizado', 'Radio', 'Espejos eléctricos']
-    }
-  },
-  {
-    id: 4,
-    titulo: 'Honda CB 190R 2021',
-    descripcion: 'Moto deportiva en excelente estado',
-    precio: 3000,
-    tipo: 'moto',
-    marca: 'Honda',
-    modelo: 'CB 190R',
-    año: 2021,
-    kilometraje: 8000,
-    caracteristicas: ['Motor 190cc', 'Manual', 'Nafta', 'Deportiva'],
-    imagen: 'https://placehold.co/600x400/blue/white?text=Honda+CB190R',
-    imagenes: [
-      'https://placehold.co/600x400/blue/white?text=Honda+CB190R+1',
-      'https://placehold.co/600x400/blue/white?text=Honda+CB190R+2',
-      'https://placehold.co/600x400/blue/white?text=Honda+CB190R+3'
-    ],
-    detalles: {
-      combustible: 'Nafta',
-      transmision: 'Manual',
-      motor: '190cc',
-      cilindrada: '190cc',
-      potencia: '17 HP',
-      traccion: 'Trasera',
-      color: 'Negro/Rojo',
-      puertas: 0,
-      asientos: 2,
-      equipamiento: ['Frenos a disco', 'Tablero digital', 'Luces LED', 'Escape deportivo', 'Llantas de aleación']
-    }
-  }
-];
-
-// Definición de tipos para los parámetros de la página
-type Params = {
+// Tipo para los vehículos
+type Vehiculo = {
   id: number;
+  titulo: string;
+  descripcion: string;
+  precio: number;
+  tipo: string;
+  marca: string;
+  modelo: string;
+  año: number;
+  kilometraje: number;
+  caracteristicas: string[];
+  imagen: string;
+  imagenes: string[];
+  detalles: {
+    combustible: string;
+    transmision: string;
+    motor: string;
+    cilindrada: string;
+    potencia: string;
+    traccion: string;
+    color: string;
+    puertas: number;
+    asientos: number;
+    equipamiento: string[];
+  };
+};
+
+interface VehiculoDetailPageProps {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default function VehiculoDetailPage({ params }: { params: Params }) {
-  const vehiculoId = params.id;
-  const vehiculo = VEHICULOS_EJEMPLO.find(v => v.id === vehiculoId);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+export default function VehiculoDetailPage({ params }: VehiculoDetailPageProps) {
+  const [vehiculo, setVehiculo] = useState<Vehiculo | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
 
-  if (!vehiculo) {
-    notFound();
+  useEffect(() => {
+    params.then(setResolvedParams);
+  }, [params]);
+
+  useEffect(() => {
+    if (!resolvedParams?.id) return;
+    
+    const fetchVehiculo = async () => {
+      try {
+        const vehiculoId = parseInt(resolvedParams.id);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/data/vehiculos.json`);
+        
+        if (!res.ok) {
+          throw new Error('Error al cargar los datos de vehículos');
+        }
+        
+        const data = await res.json();
+        const vehiculoEncontrado = data.vehiculos.find((v: Vehiculo) => v.id === vehiculoId);
+        
+        if (!vehiculoEncontrado) {
+          setError('Vehículo no encontrado');
+          return;
+        }
+        
+        setVehiculo(vehiculoEncontrado);
+      } catch (err) {
+        console.error('Error al cargar los datos de vehículos:', err);
+        setError('Error al cargar el vehículo');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVehiculo();
+  }, [resolvedParams?.id]);
+
+  const handleContactar = () => {
+    // Lógica para contactar
+    console.log('Contactar por vehículo:', vehiculo?.id);
+    // Aquí podrías abrir un modal o redirigir a un formulario de contacto
+  };
+
+  const handleSolicitarPrueba = () => {
+    // Lógica para solicitar prueba de manejo
+    console.log('Solicitar prueba de manejo para:', vehiculo?.id);
+  };
+
+  const handleCompartir = () => {
+    // Lógica para compartir
+    if (navigator.share && vehiculo) {
+      navigator.share({
+        title: vehiculo.titulo,
+        text: vehiculo.descripcion,
+        url: window.location.href,
+      });
+    } else {
+      // Fallback para navegadores que no soportan Web Share API
+      navigator.clipboard.writeText(window.location.href);
+      alert('Enlace copiado al portapapeles');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando vehículo...</p>
+        </div>
+      </div>
+    );
   }
-  
-  const nextImage = () => {
-    setCurrentImageIndex((prevIndex) => 
-      prevIndex === (vehiculo.imagenes?.length - 1) ? 0 : prevIndex + 1
+
+  if (error || !vehiculo) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Vehículo no encontrado</h2>
+          <p className="text-gray-600 mb-8">El vehículo que buscas no existe o no está disponible.</p>
+          <Link 
+            href="/martillero" 
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300"
+          >
+            Volver a vehículos
+          </Link>
+        </div>
+      </div>
     );
-  };
-  
-  const prevImage = () => {
-    setCurrentImageIndex((prevIndex) => 
-      prevIndex === 0 ? (vehiculo.imagenes?.length - 1) : prevIndex - 1
-    );
-  };
-  
-  const goToImage = (index: number) => {
-    setCurrentImageIndex(index);
-  };
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -195,48 +167,11 @@ export default function VehiculoDetailPage({ params }: { params: Params }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Imagen principal */}
-          <div className="relative h-96">
-            <Image
-              src={vehiculo.imagenes?.[currentImageIndex] || vehiculo.imagen}
-              alt={`${vehiculo.titulo} - Imagen ${currentImageIndex + 1}`}
-              fill
-              className="object-cover"
+          <div className="relative">
+            <ImageCarousel 
+              imagenes={vehiculo.imagenes || [vehiculo.imagen]} 
+              titulo={vehiculo.titulo}
             />
-            
-            {/* Botones de navegación */}
-            <button 
-              onClick={prevImage}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 hover:bg-opacity-100 rounded-full p-2 focus:outline-none transition duration-300"
-              aria-label="Imagen anterior"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            
-            <button 
-              onClick={nextImage}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 hover:bg-opacity-100 rounded-full p-2 focus:outline-none transition duration-300"
-              aria-label="Imagen siguiente"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-            
-            {/* Indicadores */}
-            <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
-              {vehiculo.imagenes?.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => goToImage(index)}
-                  className={`h-2 w-2 rounded-full focus:outline-none transition-all duration-300 ${
-                    currentImageIndex === index ? 'bg-white w-4' : 'bg-white bg-opacity-50'
-                  }`}
-                  aria-label={`Ir a imagen ${index + 1}`}
-                />
-              ))}
-            </div>
             
             <div className="absolute top-4 right-4">
               <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium capitalize">
@@ -364,15 +299,24 @@ export default function VehiculoDetailPage({ params }: { params: Params }) {
                   </div>
 
                   <div className="space-y-4">
-                    <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                    <button 
+                      onClick={handleContactar}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300"
+                    >
                       Contactar por este vehículo
                     </button>
                     
-                    <button className="w-full bg-white hover:bg-gray-50 text-blue-600 border-2 border-blue-600 font-bold py-3 px-4 rounded-lg transition duration-300">
+                    <button 
+                      onClick={handleSolicitarPrueba}
+                      className="w-full bg-white hover:bg-gray-50 text-blue-600 border-2 border-blue-600 font-bold py-3 px-4 rounded-lg transition duration-300"
+                    >
                       Solicitar prueba de manejo
                     </button>
                     
-                    <button className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-4 rounded-lg transition duration-300">
+                    <button 
+                      onClick={handleCompartir}
+                      className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-4 rounded-lg transition duration-300"
+                    >
                       Compartir vehículo
                     </button>
                   </div>

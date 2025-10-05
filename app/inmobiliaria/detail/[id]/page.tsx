@@ -1,148 +1,136 @@
-'use client';
-
-import React, { useState } from 'react';
+"use client"
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import ImageCarousel from '../../../components/ImageCarousel';
 
-// Datos de ejemplo para propiedades (mismo que en la página principal)
-const PROPIEDADES_EJEMPLO = [
-  {
-    id: 1,
-    titulo: 'Casa en Barrio Norte',
-    descripcion: 'Hermosa casa de 3 dormitorios con jardín y piscina',
-    precio: 150000,
-    tipo: 'venta',
-    categoria: 'casa',
-    ubicacion: 'Alta Gracia, Córdoba',
-    caracteristicas: ['3 dormitorios', '2 baños', 'Jardín', 'Piscina', 'Garage'],
-    imagen: 'https://placehold.co/600x400/red/white?text=Casa+en+Barrio+Norte',
-    imagenes: [
-      'https://placehold.co/600x400/red/white?text=Casa+en+Barrio+Norte+1',
-      'https://placehold.co/600x400/red/white?text=Casa+en+Barrio+Norte+2',
-      'https://placehold.co/600x400/red/white?text=Casa+en+Barrio+Norte+3',
-      'https://placehold.co/600x400/red/white?text=Casa+en+Barrio+Norte+4'
-    ],
-    detalles: {
-      superficie: '180 m²',
-      terreno: '400 m²',
-      antiguedad: '5 años',
-      orientacion: 'Norte',
-      estado: 'Excelente',
-      servicios: ['Agua corriente', 'Gas natural', 'Electricidad', 'Cloacas', 'Internet'],
-      ambientes: 6,
-      cocheras: 2
-    }
-  },
-  {
-    id: 2,
-    titulo: 'Departamento céntrico',
-    descripcion: 'Moderno departamento de 2 dormitorios en el centro de la ciudad',
-    precio: 80000,
-    tipo: 'venta',
-    categoria: 'departamento',
-    ubicacion: 'Alta Gracia, Córdoba',
-    caracteristicas: ['2 dormitorios', '1 baño', 'Balcón', 'Cocina integrada'],
-    imagen: 'https://placehold.co/600x400/red/white?text=Departamento+céntrico',
-    imagenes: [
-      'https://placehold.co/600x400/red/white?text=Departamento+céntrico+1',
-      'https://placehold.co/600x400/red/white?text=Departamento+céntrico+2',
-      'https://placehold.co/600x400/red/white?text=Departamento+céntrico+3'
-    ],
-    detalles: {
-      superficie: '65 m²',
-      terreno: 'N/A',
-      antiguedad: '2 años',
-      orientacion: 'Este',
-      estado: 'Muy bueno',
-      servicios: ['Agua corriente', 'Gas natural', 'Electricidad', 'Internet'],
-      ambientes: 3,
-      cocheras: 1
-    }
-  },
-  {
-    id: 3,
-    titulo: 'Terreno en zona residencial',
-    descripcion: 'Amplio terreno de 500m² en zona residencial',
-    precio: 50000,
-    tipo: 'venta',
-    categoria: 'terreno',
-    ubicacion: 'Alta Gracia, Córdoba',
-    caracteristicas: ['500m²', 'Servicios disponibles', 'Zona residencial'],
-    imagen: 'https://placehold.co/600x400/red/white?text=Terreno+residencial',
-    imagenes: [
-      'https://placehold.co/600x400/red/white?text=Terreno+residencial+1',
-      'https://placehold.co/600x400/red/white?text=Terreno+residencial+2',
-      'https://placehold.co/600x400/red/white?text=Terreno+residencial+3'
-    ],
-    detalles: {
-      superficie: 'N/A',
-      terreno: '500 m²',
-      antiguedad: 'N/A',
-      orientacion: 'Norte-Sur',
-      estado: 'Disponible',
-      servicios: ['Agua corriente', 'Gas natural', 'Electricidad', 'Cloacas'],
-      ambientes: 0,
-      cocheras: 0
-    }
-  },
-  {
-    id: 4,
-    titulo: 'Casa para alquiler',
-    descripcion: 'Casa de 2 dormitorios disponible para alquiler',
-    precio: 500,
-    tipo: 'alquiler',
-    categoria: 'casa',
-    ubicacion: 'Alta Gracia, Córdoba',
-    caracteristicas: ['2 dormitorios', '1 baño', 'Patio', 'Cocina equipada'],
-    imagen: 'https://placehold.co/600x400/red/white?text=Casa+alquiler',
-    imagenes: [
-      'https://placehold.co/600x400/red/white?text=Casa+alquiler+1',
-      'https://placehold.co/600x400/red/white?text=Casa+alquiler+2',
-      'https://placehold.co/600x400/red/white?text=Casa+alquiler+3'
-    ],
-    detalles: {
-      superficie: '120 m²',
-      terreno: '200 m²',
-      antiguedad: '10 años',
-      orientacion: 'Sur',
-      estado: 'Bueno',
-      servicios: ['Agua corriente', 'Gas natural', 'Electricidad', 'Cloacas'],
-      ambientes: 4,
-      cocheras: 1
-    }
-  }
-];
-
-// Definición de tipos para los parámetros de la página
-type Params = {
+// Tipo para las propiedades
+interface Propiedad {
   id: number;
+  titulo: string;
+  descripcion: string;
+  precio: number;
+  tipo: string;
+  categoria: string;
+  ubicacion: string;
+  caracteristicas: string[];
+  imagen: string;
+  imagenes: string[];
+  detalles: {
+    superficie: string;
+    terreno: string;
+    antiguedad: string;
+    orientacion: string;
+    estado: string;
+    servicios: string[];
+    ambientes: number;
+    cocheras: number;
+  };
 }
 
-export default function PropiedadDetailPage({ params }: { params: Params }) {
-  const propiedadId = params.id;
-  const propiedad = PROPIEDADES_EJEMPLO.find(p => p.id === propiedadId);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+interface PropiedadDetailPageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
 
-  if (!propiedad) {
-    notFound();
+export default function PropiedadDetailPage({ params }: PropiedadDetailPageProps) {
+  const [propiedad, setPropiedad] = useState<Propiedad | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
+
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolved = await params;
+      setResolvedParams(resolved);
+    };
+    resolveParams();
+  }, [params]);
+
+  useEffect(() => {
+    if (!resolvedParams) return;
+    
+    const fetchPropiedad = async () => {
+      try {
+        const propiedadId = parseInt(resolvedParams.id);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/data/propiedades.json`);
+        
+        if (!res.ok) {
+          throw new Error('Error al cargar los datos');
+        }
+        
+        const data = await res.json();
+        const propiedadEncontrada = data.propiedades.find((p: Propiedad) => p.id === propiedadId);
+        
+        if (!propiedadEncontrada) {
+          setError('Propiedad no encontrada');
+          return;
+        }
+        
+        setPropiedad(propiedadEncontrada);
+      } catch (err) {
+        console.error('Error al cargar los datos de propiedades:', err);
+        setError('Error al cargar la propiedad');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPropiedad();
+  }, [resolvedParams?.id]);
+
+  const handleContactar = () => {
+    // Lógica para contactar
+    console.log('Contactar por propiedad:', propiedad?.id);
+  };
+
+  const handleSolicitarVisita = () => {
+    // Lógica para solicitar visita
+    console.log('Solicitar visita para propiedad:', propiedad?.id);
+  };
+
+  const handleCompartir = () => {
+    // Lógica para compartir
+    if (navigator.share && propiedad) {
+      navigator.share({
+        title: propiedad.titulo,
+        text: propiedad.descripcion,
+        url: window.location.href,
+      });
+    } else {
+      // Fallback para navegadores que no soportan Web Share API
+      navigator.clipboard.writeText(window.location.href);
+      alert('Enlace copiado al portapapeles');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando propiedad...</p>
+        </div>
+      </div>
+    );
   }
-  
-  const nextImage = () => {
-    setCurrentImageIndex((prevIndex) => 
-      prevIndex === (propiedad.imagenes?.length - 1) ? 0 : prevIndex + 1
+
+  if (error || !propiedad) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Propiedad no encontrada</h2>
+          <p className="text-gray-600 mb-8">La propiedad que buscas no existe o no está disponible.</p>
+          <Link 
+            href="/inmobiliaria" 
+            className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300"
+          >
+            Volver a propiedades
+          </Link>
+        </div>
+      </div>
     );
-  };
-  
-  const prevImage = () => {
-    setCurrentImageIndex((prevIndex) => 
-      prevIndex === 0 ? (propiedad.imagenes?.length - 1) : prevIndex - 1
-    );
-  };
-  
-  const goToImage = (index: number) => {
-    setCurrentImageIndex(index);
-  };
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -179,48 +167,11 @@ export default function PropiedadDetailPage({ params }: { params: Params }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Carrusel de imágenes */}
-          <div className="relative h-96">
-            <Image
-              src={propiedad.imagenes?.[currentImageIndex] || propiedad.imagen}
-              alt={`${propiedad.titulo} - Imagen ${currentImageIndex + 1}`}
-              fill
-              className="object-cover"
+          <div className="relative">
+            <ImageCarousel 
+              imagenes={propiedad.imagenes || [propiedad.imagen]} 
+              titulo={propiedad.titulo}
             />
-            
-            {/* Botones de navegación */}
-            <button 
-              onClick={prevImage}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 hover:bg-opacity-100 rounded-full p-2 focus:outline-none transition duration-300"
-              aria-label="Imagen anterior"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            
-            <button 
-              onClick={nextImage}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 hover:bg-opacity-100 rounded-full p-2 focus:outline-none transition duration-300"
-              aria-label="Imagen siguiente"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-            
-            {/* Indicadores */}
-            <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
-              {propiedad.imagenes?.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => goToImage(index)}
-                  className={`h-2 w-2 rounded-full focus:outline-none transition-all duration-300 ${
-                    currentImageIndex === index ? 'bg-white w-4' : 'bg-white bg-opacity-50'
-                  }`}
-                  aria-label={`Ir a imagen ${index + 1}`}
-                />
-              ))}
-            </div>
             
             <div className="absolute top-4 right-4">
               <span className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium">
@@ -331,15 +282,24 @@ export default function PropiedadDetailPage({ params }: { params: Params }) {
                   </div>
 
                   <div className="space-y-4">
-                    <button className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                    <button 
+                      onClick={handleContactar}
+                      className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300"
+                    >
                       Contactar por esta propiedad
                     </button>
                     
-                    <button className="w-full bg-white hover:bg-gray-50 text-red-600 border-2 border-red-600 font-bold py-3 px-4 rounded-lg transition duration-300">
+                    <button 
+                      onClick={handleSolicitarVisita}
+                      className="w-full bg-white hover:bg-gray-50 text-red-600 border-2 border-red-600 font-bold py-3 px-4 rounded-lg transition duration-300"
+                    >
                       Solicitar visita
                     </button>
                     
-                    <button className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-4 rounded-lg transition duration-300">
+                    <button 
+                      onClick={handleCompartir}
+                      className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-4 rounded-lg transition duration-300"
+                    >
                       Compartir propiedad
                     </button>
                   </div>

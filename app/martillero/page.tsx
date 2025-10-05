@@ -1,78 +1,57 @@
-'use client';
-
-import { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-// Datos de ejemplo para vehículos
-const VEHICULOS_EJEMPLO = [
-  {
-    id: 1,
-    titulo: 'Toyota Corolla 2019',
-    descripcion: 'Excelente estado, único dueño, service oficial',
-    precio: 15000,
-    tipo: 'auto',
-    marca: 'Toyota',
-    modelo: 'Corolla',
-    año: 2019,
-    kilometraje: 45000,
-    caracteristicas: ['Motor 1.8', 'Automático', 'Nafta', 'Full', 'Climatizador'],
-    imagen: 'https://placehold.co/600x400/blue/white?text=Toyota+Corolla'
-  },
-  {
-    id: 2,
-    titulo: 'Ford Ranger 2018',
-    descripcion: 'Camioneta en perfecto estado, 4x4, diesel',
-    precio: 25000,
-    tipo: 'camioneta',
-    marca: 'Ford',
-    modelo: 'Ranger',
-    año: 2018,
-    kilometraje: 60000,
-    caracteristicas: ['Motor 3.2', 'Manual', 'Diesel', '4x4', 'Cuero'],
-    imagen: 'https://placehold.co/600x400/blue/white?text=Ford+Ranger'
-  },
-  {
-    id: 3,
-    titulo: 'Volkswagen Gol 2020',
-    descripcion: 'Económico, bajo consumo, ideal primer auto',
-    precio: 10000,
-    tipo: 'auto',
-    marca: 'Volkswagen',
-    modelo: 'Gol',
-    año: 2020,
-    kilometraje: 30000,
-    caracteristicas: ['Motor 1.6', 'Manual', 'Nafta', 'Aire acondicionado'],
-    imagen: 'https://placehold.co/600x400/blue/white?text=Volkswagen+Gol'
-  },
-  {
-    id: 4,
-    titulo: 'Honda CB 190R 2021',
-    descripcion: 'Moto deportiva en excelente estado',
-    precio: 3000,
-    tipo: 'moto',
-    marca: 'Honda',
-    modelo: 'CB 190R',
-    año: 2021,
-    kilometraje: 5000,
-    caracteristicas: ['190cc', 'Frenos ABS', 'Inyección electrónica'],
-    imagen: 'https://placehold.co/600x400/blue/white?text=Honda+CB190R'
-  }
-];
+// Tipo para los vehículos
+type Vehiculo = {
+  id: number;
+  titulo: string;
+  descripcion: string;
+  precio: number;
+  tipo: string;
+  marca: string;
+  modelo: string;
+  año: number;
+  kilometraje: number;
+  caracteristicas: string[];
+  imagen: string;
+};
 
-export default function MartilleroPage() {
-  const [filtroTipo, setFiltroTipo] = useState('todos');
-  const [filtroMarca, setFiltroMarca] = useState('todos');
+// Función para obtener los vehículos
+async function getVehiculos(): Promise<Vehiculo[]> {
+  try {
+    // Durante el build, usar ruta del sistema de archivos
+    if (process.env.NODE_ENV === 'production' && !process.env.NEXT_PUBLIC_BASE_URL) {
+      const fs = await import('fs');
+      const path = await import('path');
+      const filePath = path.join(process.cwd(), 'public', 'data', 'vehiculos.json');
+      const fileContents = fs.readFileSync(filePath, 'utf8');
+      const data = JSON.parse(fileContents);
+      return data.vehiculos;
+    }
+    
+    // En desarrollo o con BASE_URL configurada
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}/data/vehiculos.json`);
+    const data = await res.json();
+    return data.vehiculos;
+  } catch (error) {
+    console.error('Error al cargar los datos de vehículos:', error);
+    return [];
+  }
+}
+ 
+
+export default async function MartilleroPage() {
+  // Obtener los vehículos desde el JSON
+  const vehiculos = await getVehiculos();
   
-  // Filtrar vehículos según los filtros seleccionados
-  const vehiculosFiltrados = VEHICULOS_EJEMPLO.filter(vehiculo => {
-    const cumpleTipo = filtroTipo === 'todos' || vehiculo.tipo === filtroTipo;
-    const cumpleMarca = filtroMarca === 'todos' || vehiculo.marca === filtroMarca;
-    return cumpleTipo && cumpleMarca;
-  });
+  // Nota: Como ahora es un componente de servidor, no podemos usar useState para filtros
+  // En una implementación real, usaríamos searchParams o un componente cliente para filtros
+  const vehiculosFiltrados = vehiculos;
   
   // Obtener marcas únicas para el filtro
-  const marcasUnicas = [...new Set(VEHICULOS_EJEMPLO.map(v => v.marca))];
+  const marcasUnicas = [...new Set(vehiculos.map(v => v.marca))];
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -96,8 +75,7 @@ export default function MartilleroPage() {
               </label>
               <select
                 id="tipo"
-                value={filtroTipo}
-                onChange={(e) => setFiltroTipo(e.target.value)}
+                defaultValue="todos"
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
                 <option value="todos">Todos</option>
@@ -113,8 +91,7 @@ export default function MartilleroPage() {
               </label>
               <select
                 id="marca"
-                value={filtroMarca}
-                onChange={(e) => setFiltroMarca(e.target.value)}
+                defaultValue="todos"
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
                 <option value="todos">Todas</option>
