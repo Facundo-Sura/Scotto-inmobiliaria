@@ -52,7 +52,8 @@ export default function VehiculoDetailPage({ params }: VehiculoDetailPageProps) 
     const fetchVehiculo = async () => {
       try {
         const vehiculoId = parseInt(resolvedParams.id);
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/data/vehiculos.json`);
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+        const res = await fetch(`${baseUrl}/data/vehiculos.json`);
         
         if (!res.ok) {
           throw new Error('Error al cargar los datos de vehículos');

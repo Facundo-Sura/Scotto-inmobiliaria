@@ -53,7 +53,8 @@ export default function PropiedadDetailPage({ params }: PropiedadDetailPageProps
     const fetchPropiedad = async () => {
       try {
         const propiedadId = parseInt(resolvedParams.id);
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/data/propiedades.json`);
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+        const res = await fetch(`${baseUrl}/data/propiedades.json`);
         
         if (!res.ok) {
           throw new Error('Error al cargar los datos');

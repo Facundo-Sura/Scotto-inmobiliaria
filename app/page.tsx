@@ -1,5 +1,4 @@
 import Link from "next/link";
-import WhatsAppButton from "./components/whatsappButton";
 
 export default function Home() {
   return (
@@ -129,7 +128,6 @@ export default function Home() {
           </Link>
         </div>
       </section>
-          <WhatsAppButton />
     </div>
   );
 }
