@@ -11,7 +11,7 @@ export default function Home() {
               Eduardo Raul Scotto
             </h1>
             <p className="text-xl md:text-2xl mb-8">
-              Servicios inmobiliarios y de martillero en Alta Gracia, Córdoba
+              Martillero público y judicial y servicios inmobiliarios en Alta Gracia, Córdoba
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link
