@@ -66,7 +66,11 @@ export default async function InmobiliariaPage() {
           <p className="text-xl mb-8">
             Contáctanos y te ayudaremos a encontrar la propiedad perfecta para ti.
           </p>
-          <Link href="/contacto" className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300">
+          <Link
+          href="https://mail.google.com/mail/?view=cm&fs=1&to=inmobiliariascotto@hotmail.com&su=Consulta%20desde%20tu%20portafolio&body=Hola%20Facu,%20quiero%20saber%20más%20sobre%20tus%20servicios."
+            target="_blank"
+            rel="noopener noreferrer"
+          className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300">
             Contactar ahora
           </Link>
         </div>

@@ -78,7 +78,7 @@ export default function PropiedadDetailPage({ params }: PropiedadDetailPageProps
     };
 
     fetchPropiedad();
-  }, [resolvedParams?.id]);
+  }, [resolvedParams]);
 
   const handleContactar = () => {
     // Lógica para contactar
