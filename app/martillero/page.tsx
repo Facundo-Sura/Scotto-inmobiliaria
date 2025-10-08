@@ -53,9 +53,6 @@ export default async function MartilleroPage() {
   // Obtener los vehículos desde el JSON
   const vehiculos = await getVehiculos();
 
-  // Obtener marcas únicas para el filtro
-  const marcasUnicas = [...new Set(vehiculos.map((v) => v.marca))];
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
