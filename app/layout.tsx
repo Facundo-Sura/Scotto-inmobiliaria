@@ -1,7 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Audiowide } from "next/font/google";
-import WhatsAppButton from "./components/whatsappButton";
+import WhatsappFlyButton from "./components/WhatsappFlyButton";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { Providers } from "./providers";
@@ -34,7 +34,7 @@ export default function RootLayout({
           <Navbar />
           <main className="min-h-screen">
             {children}
-            <WhatsAppButton />
+            <WhatsappFlyButton />
           </main>
           <Footer />
         </Providers>

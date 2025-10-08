@@ -56,7 +56,7 @@ export default function AcercaDeMi() {
               
               <div className="mb-6">
                 <h3 className="text-xl font-semibold text-gray-700 mb-2">Matrícula Profesional</h3>
-                <p className="text-gray-600">CUCICBA N° 3452 | CMCPSI N° 5678</p>
+                <p className="text-gray-600">Nª de Matrícula: 2127</p>
               </div>
               
               <div className="space-y-4">
