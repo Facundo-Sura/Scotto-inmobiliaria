@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import Detail from '@/app/components/Detail';
-import { PropiedadDetalle, ItemTipo } from '@/app/types';
+import { PropiedadDetalle } from '@/app/types';
 
 interface PageProps {
   params: { id: string };
