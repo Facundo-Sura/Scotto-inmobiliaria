@@ -1,8 +1,7 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
 import { PropiedadDetalle, VehiculoDetalle, ItemTipo } from '../types';
 import WhatsAppButton from './whatsappButton';
 
