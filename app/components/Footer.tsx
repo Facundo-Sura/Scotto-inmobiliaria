@@ -6,11 +6,19 @@ import Link from 'next/link';
 export default function Footer() {
   const pathname = usePathname();
   
-  // Determinar si estamos en la sección inmobiliaria o martillero
+  // Determinar en qué sección estamos
   const isRealEstate = pathname.startsWith('/inmobiliaria') || pathname === '/';
+  const isAuctions = pathname.startsWith('/subastas');
   
   // Colores según la sección
-  const primaryColor = isRealEstate ? 'bg-red-600' : 'bg-blue-600';
+  let primaryColor;
+  if (isRealEstate) {
+    primaryColor = 'bg-red-600';
+  } else if (isAuctions) {
+    primaryColor = 'bg-green-600';
+  } else {
+    primaryColor = 'bg-blue-600';
+  }
   const textColor = 'text-white';
   
   return (
@@ -19,7 +27,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <h3 className="text-lg font-semibold mb-4">
-              {isRealEstate ? 'Inmobiliaria Scotto' : 'Martillero Eduardo Raul Scotto'}
+              {isRealEstate ? 'Inmobiliaria Scotto' : isAuctions ? 'Subastas Scotto' : 'Martillero Eduardo Raul Scotto'}
             </h3>
             <p className="text-sm">
               Servicios profesionales en Alta Gracia, Córdoba - Argentina
@@ -42,6 +50,11 @@ export default function Footer() {
               <li>
                 <Link href="/martillero" className="text-sm hover:underline">
                   Martillero
+                </Link>
+              </li>
+              <li>
+                <Link href="/subastas" className="text-sm hover:underline">
+                  Subastas
                 </Link>
               </li>
               <li>

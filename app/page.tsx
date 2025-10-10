@@ -34,7 +34,7 @@ export default function Home() {
       {/* Secciones Principales */}
       <section className="py-16 px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Sección Inmobiliaria */}
             <div className="bg-white rounded-lg shadow-lg overflow-hidden">
               <div className="h-64 bg-red-600 flex items-center justify-center">
@@ -103,6 +103,41 @@ export default function Home() {
                   className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300"
                 >
                   Ver vehículos
+                </Link>
+              </div>
+            </div>
+
+            {/* Sección Subastas */}
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="h-64 bg-green-600 flex items-center justify-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-24 w-24 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+              </div>
+              <div className="p-6">
+                <h2 className="text-2xl font-bold mb-4 text-green-600">
+                  Subastas
+                </h2>
+                <p className="text-gray-700 mb-6">
+                  Participa en nuestras subastas de propiedades, vehículos y artículos diversos. 
+                  Oportunidades únicas con precios competitivos y transacciones seguras.
+                </p>
+                <Link
+                  href="/subastas"
+                  className="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300"
+                >
+                  Ver subastas
                 </Link>
               </div>
             </div>
