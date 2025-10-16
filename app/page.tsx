@@ -154,7 +154,7 @@ export default function Home() {
             vehículos en Alta Gracia, Córdoba.
           </p>
           <Link
-            href="https://mail.google.com/mail/?view=cm&fs=1&to=inmobiliariascotto@hotmail.com&su=Consulta%20desde%20tu%20portafolio&body=Hola%20Facu,%20quiero%20saber%20más%20sobre%20tus%20servicios."
+            href="https://mail.google.com/mail/?view=cm&fs=1&to=inmobiliariascotto@hotmail.com&su=Consulta%20desde%20inmobiliariascotto.com&body=Hola%20señor%20Eduado%20Scotto,%20quiero%20saber%20más%20sobre%20sus%20servicios%20inmobiliarios."
             target="_blank"
             rel="noopener noreferrer"
             className="bg-black hover:bg-gray-800 text-white font-bold py-3 px-8 rounded-lg transition duration-300"
