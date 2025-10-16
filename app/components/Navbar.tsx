@@ -53,7 +53,7 @@ export default function Navbar() {
               Subastas
             </Link>
             <Link href="/acerca-de-mi" className={` px-3 py-2 rounded-md text-sm font-medium ${pathname === '/acerca-de-mi' ? 'bg-gray-300' : hoverColor}`}>
-              Acerca de mí
+              Sobre mí
             </Link>
           </div>
           
@@ -118,7 +118,7 @@ export default function Navbar() {
             Subastas
           </Link>
           <Link href="/acerca-de-mi" className={` block px-3 py-2 rounded-md text-base font-medium ${pathname === '/acerca-de-mi' ? 'bg-gray-400' : hoverColor}`}>
-            Acerca de mí
+            Sobre mí
           </Link>
         </div>
       </div>
