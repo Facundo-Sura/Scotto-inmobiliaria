@@ -20,58 +20,7 @@ type Subasta = {
 
 // Datos de ejemplo para subastas
 const subastasEjemplo: Subasta[] = [
-  {
-    id: 1,
-    titulo: 'Casa en Country San Carlos',
-    descripcion: 'Hermosa casa de 3 dormitorios con piscina y amplio jardín. Perfecta para familia.',
-    imagen: '/data/subastas/casa-country.jpg',
-    precioInicial: 150000,
-    precioActual: 185000,
-    fechaInicio: '2024-01-15',
-    fechaFin: '2024-02-15',
-    estado: 'activa',
-    categoria: 'inmuebles',
-    ofertas: 12
-  },
-  {
-    id: 2,
-    titulo: 'Toyota Hilux 2022',
-    descripcion: 'Camioneta 4x4 en perfecto estado, full equipo, 25.000 km.',
-    imagen: '/data/subastas/hilux-2022.jpg',
-    precioInicial: 35000,
-    precioActual: 42000,
-    fechaInicio: '2024-01-20',
-    fechaFin: '2024-02-05',
-    estado: 'activa',
-    categoria: 'vehiculos',
-    ofertas: 8
-  },
-  {
-    id: 3,
-    titulo: 'Lote en Altos del Valle',
-    descripcion: 'Terreno de 500m² con servicios, ideal para construcción.',
-    imagen: '/data/subastas/lote-altos-valle.jpg',
-    precioInicial: 45000,
-    precioActual: 45000,
-    fechaInicio: '2024-02-01',
-    fechaFin: '2024-02-28',
-    estado: 'proximamente',
-    categoria: 'terrenos',
-    ofertas: 0
-  },
-  {
-    id: 4,
-    titulo: 'Colección de Arte Moderno',
-    descripcion: '5 obras de artistas contemporáneos nacionales.',
-    imagen: '/data/subastas/arte-moderno.jpg',
-    precioInicial: 8000,
-    precioActual: 9500,
-    fechaInicio: '2024-01-10',
-    fechaFin: '2024-01-31',
-    estado: 'activa',
-    categoria: 'coleccionables',
-    ofertas: 5
-  }
+  
 ];
 
 export default function SubastasPage() {

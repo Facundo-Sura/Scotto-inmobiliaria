@@ -91,38 +91,7 @@ export default function AdminPage() {
 function SubastasAdmin() {
   // Datos de ejemplo para subastas
   const [subastas, setSubastas] = useState([
-    {
-      id: 1,
-      titulo: 'Subasta de Arte Contemporáneo',
-      categoria: 'arte',
-      fechaFin: '2024-12-15',
-      precioActual: 2500,
-      estado: 'activa',
-    },
-    {
-      id: 2,
-      titulo: 'Subasta de Antigüedades',
-      categoria: 'antigüedades',
-      fechaFin: '2024-11-30',
-      precioActual: 1200,
-      estado: 'activa',
-    },
-    {
-      id: 3,
-      titulo: 'Subasta de Joyería',
-      categoria: 'joyería',
-      fechaFin: '2024-12-20',
-      precioActual: 5000,
-      estado: 'activa',
-    },
-    {
-      id: 4,
-      titulo: 'Subasta de Vehículos Clásicos',
-      categoria: 'vehículos',
-      fechaFin: '2024-10-25',
-      precioActual: 18000,
-      estado: 'finalizada',
-    },
+    
   ]);
   
   const eliminarSubasta = (id: number) => {
@@ -216,34 +185,7 @@ function SubastasAdmin() {
 function PropiedadesAdmin() {
   // Datos de ejemplo para propiedades
   const [propiedades, setPropiedades] = useState([
-    {
-      id: 1,
-      titulo: 'Casa en Barrio Norte',
-      tipo: 'venta',
-      categoria: 'casa',
-      precio: 150000,
-    },
-    {
-      id: 2,
-      titulo: 'Departamento céntrico',
-      tipo: 'venta',
-      categoria: 'departamento',
-      precio: 80000,
-    },
-    {
-      id: 3,
-      titulo: 'Terreno en zona residencial',
-      tipo: 'venta',
-      categoria: 'terreno',
-      precio: 50000,
-    },
-    {
-      id: 4,
-      titulo: 'Casa para alquiler',
-      tipo: 'alquiler',
-      categoria: 'casa',
-      precio: 500,
-    },
+    
   ]);
   
   const eliminarPropiedad = (id: number) => {
@@ -325,34 +267,7 @@ function PropiedadesAdmin() {
 function VehiculosAdmin() {
   // Datos de ejemplo para vehículos
   const [vehiculos, setVehiculos] = useState([
-    {
-      id: 1,
-      titulo: 'Toyota Corolla 2019',
-      tipo: 'auto',
-      marca: 'Toyota',
-      precio: 15000,
-    },
-    {
-      id: 2,
-      titulo: 'Ford Ranger 2018',
-      tipo: 'camioneta',
-      marca: 'Ford',
-      precio: 25000,
-    },
-    {
-      id: 3,
-      titulo: 'Volkswagen Gol 2020',
-      tipo: 'auto',
-      marca: 'Volkswagen',
-      precio: 10000,
-    },
-    {
-      id: 4,
-      titulo: 'Honda CB 190R 2021',
-      tipo: 'moto',
-      marca: 'Honda',
-      precio: 3000,
-    },
+    
   ]);
   
   const eliminarVehiculo = (id: number) => {
