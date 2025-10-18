@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
+import SubastaList from '../components/SubastaList';
 
 // Tipo para las subastas
 type Subasta = {
-  id: number;
+  id: string;
   titulo: string;
   descripcion: string;
   imagen: string;
@@ -18,45 +18,63 @@ type Subasta = {
   ofertas: number;
 };
 
-// Datos de ejemplo para subastas
-const subastasEjemplo: Subasta[] = [
-  
-];
-
 export default function SubastasPage() {
   const [subastas, setSubastas] = useState<Subasta[]>([]);
-  const [categoriaFiltro, setCategoriaFiltro] = useState('todas');
-  const [estadoFiltro, setEstadoFiltro] = useState('todas');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Aquí se cargarían las subastas reales desde una API
-    setSubastas(subastasEjemplo);
+    const fetchSubastas = async () => {
+      try {
+        setLoading(true);
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://scotto-inmobiliaria-backend.onrender.com';
+        const response = await fetch(`${apiUrl}/subastas`);
+        
+        if (!response.ok) {
+          throw new Error('Error al cargar las subastas');
+        }
+        
+        const data = await response.json();
+        setSubastas(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Error al cargar las subastas');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSubastas();
   }, []);
 
-  const subastasFiltradas = subastas.filter(subasta => {
-    const cumpleCategoria = categoriaFiltro === 'todas' || subasta.categoria === categoriaFiltro;
-    const cumpleEstado = estadoFiltro === 'todas' || subasta.estado === estadoFiltro;
-    return cumpleCategoria && cumpleEstado;
-  });
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Cargando subastas...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const categorias = ['todas', 'inmuebles', 'vehiculos', 'terrenos', 'coleccionables'];
-  const estados = ['todas', 'activa', 'proximamente', 'finalizada'];
-
-  const getEstadoColor = (estado: string) => {
-    switch (estado) {
-      case 'activa': return 'bg-green-100 text-green-800';
-      case 'proximamente': return 'bg-blue-100 text-blue-800';
-      case 'finalizada': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const formatearPrecio = (precio: number) => {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS'
-    }).format(precio);
-  };
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-4">
+            <p className="font-semibold">Error</p>
+            <p>{error}</p>
+          </div>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -80,130 +98,8 @@ export default function SubastasPage() {
         </div>
       </section>
 
-      {/* Filtros */}
-      <section className="bg-white py-8 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap gap-4 items-center">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Categoría:</label>
-              <select 
-                value={categoriaFiltro} 
-                onChange={(e) => setCategoriaFiltro(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-2"
-              >
-                {categorias.map(cat => (
-                  <option key={cat} value={cat}>
-                    {cat === 'todas' ? 'Todas las categorías' : 
-                     cat === 'inmuebles' ? 'Inmuebles' :
-                     cat === 'vehiculos' ? 'Vehículos' :
-                     cat === 'terrenos' ? 'Terrenos' : 'Coleccionables'}
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Estado:</label>
-              <select 
-                value={estadoFiltro} 
-                onChange={(e) => setEstadoFiltro(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-2"
-              >
-                {estados.map(estado => (
-                  <option key={estado} value={estado}>
-                    {estado === 'todas' ? 'Todos los estados' : 
-                     estado === 'activa' ? 'Activas' :
-                     estado === 'proximamente' ? 'Próximamente' : 'Finalizadas'}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Listado de Subastas */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold mb-8 text-center">
-            Subastas Disponibles
-          </h2>
-
-          {subastasFiltradas.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No hay subastas que coincidan con los filtros seleccionados.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {subastasFiltradas.map((subasta) => (
-                <div key={subasta.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300">
-                  <div className="relative h-48">
-                    <Image
-                      src={subasta.imagen}
-                      alt={subasta.titulo}
-                      fill
-                      className="object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = '/logo.png';
-                      }}
-                    />
-                    <div className="absolute top-4 left-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getEstadoColor(subasta.estado)}`}>
-                        {subasta.estado === 'activa' ? 'Activa' : 
-                         subasta.estado === 'proximamente' ? 'Próximamente' : 'Finalizada'}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold mb-2 text-gray-800">{subasta.titulo}</h3>
-                    <p className="text-gray-600 mb-4 text-sm">{subasta.descripcion}</p>
-                    
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <p className="text-sm text-gray-500">Precio inicial</p>
-                        <p className="font-semibold text-gray-700">{formatearPrecio(subasta.precioInicial)}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Precio actual</p>
-                        <p className="font-semibold text-green-600">{formatearPrecio(subasta.precioActual)}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between items-center mb-4">
-                      <span className="text-sm text-gray-500">
-                        {subasta.ofertas} oferta{subasta.ofertas !== 1 ? 's' : ''}
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        Finaliza: {new Date(subasta.fechaFin).toLocaleDateString('es-AR')}
-                      </span>
-                    </div>
-
-                    {subasta.estado === 'activa' && (
-                      <button className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
-                        Hacer Oferta
-                      </button>
-                    )}
-                    
-                    {subasta.estado === 'proximamente' && (
-                      <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
-                        Ver Detalles
-                      </button>
-                    )}
-                    
-                    {subasta.estado === 'finalizada' && (
-                      <button className="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
-                        Ver Resultados
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+      {/* Listado de Subastas con Filtros */}
+      <SubastaList subastas={subastas} />
 
       {/* Sección de Información */}
       <section className="bg-gray-100 py-16">

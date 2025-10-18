@@ -1,5 +1,4 @@
 import React from "react";
-import Link from "next/link";
 import VehicleList from "../components/VehicleList";
 
 // Tipo para los vehículos
