@@ -2,45 +2,40 @@ import React from "react";
 import Link from "next/link";
 import PropertyList from "../components/PropertyList";
 
-// Tipo para las propiedades
+// Tipo actualizado para las propiedades según la base de datos
 type Propiedad = {
-  id: number;
+  id: string; // Cambiado a string (UUID)
   titulo: string;
   descripcion: string;
   precio: number;
-  tipo: string;
-  categoria: string;
-  ubicacion: string;
-  caracteristicas: string[];
-  imagen: string;
+  tipo: 'casa' | 'departamento' | 'terreno' | 'local' | 'oficina'; // Actualizado según ENUM
+  operacion: 'venta' | 'alquiler'; // Cambiado de 'categoria' a 'operacion'
+  direccion: string;
+  ciudad: string;
+  provincia: string;
+  habitaciones: number | null;
+  banos: number | null;
+  metros: number | null;
+  imagen: string | null;
+  fecha_publicacion: string;
 };
 
-// Función para obtener las propiedades
+// Función para obtener las propiedades desde el backend
 async function getPropiedades(): Promise<Propiedad[]> {
   try {
-    // Durante el build, usar ruta del sistema de archivos
-    if (
-      process.env.NODE_ENV === "production" &&
-      !process.env.NEXT_PUBLIC_BASE_URL
-    ) {
-      const fs = await import("fs");
-      const path = await import("path");
-      const filePath = path.join(
-        process.cwd(),
-        "public",
-        "data",
-        "propiedades.json"
-      );
-      const fileContents = fs.readFileSync(filePath, "utf8");
-      const data = JSON.parse(fileContents);
-      return data.propiedades;
+    const res = await fetch('https://scotto-inmobiliaria-backend.onrender.com/inmobiliaria', {
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status}`);
     }
-
-    // En desarrollo o con BASE_URL configurada
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/data/propiedades.json`);
+    
     const data = await res.json();
-    return data.propiedades;
+    return data;
   } catch (error) {
     console.error("Error al cargar los datos de propiedades:", error);
     return [];
@@ -48,7 +43,7 @@ async function getPropiedades(): Promise<Propiedad[]> {
 }
 
 export default async function InmobiliariaPage() {
-  // Obtener las propiedades desde el JSON
+  // Obtener las propiedades desde la API
   const propiedades = await getPropiedades();
 
   return (
@@ -73,8 +68,7 @@ export default async function InmobiliariaPage() {
             ¿No encuentras lo que buscas?
           </h2>
           <p className="text-xl mb-8">
-            Contáctanos y te ayudaremos a encontrar la propiedad perfecta para
-            ti.
+            Contáctanos y te ayudaremos a encontrar la propiedad perfecta para ti.
           </p>
           <Link
             href="https://mail.google.com/mail/?view=cm&fs=1&to=inmobiliariascotto@hotmail.com&su=Consulta%20desde%20tu%20portafolio&body=Hola%20Facu,%20quiero%20saber%20más%20sobre%20tus%20servicios."
