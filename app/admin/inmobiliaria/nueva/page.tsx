@@ -274,7 +274,6 @@ export default function NuevaPropiedadPage() {
             name="descripcion"
             value={formData.descripcion}
             onChange={handleInputChange}
-            required
             rows={4}
             className="w-full p-2 border border-gray-300 rounded"
           />
