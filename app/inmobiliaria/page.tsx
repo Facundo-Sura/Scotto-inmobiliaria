@@ -57,7 +57,7 @@ export default async function InmobiliariaPage() {
       </section>
 
       {/* Componente de filtros y listado de propiedades */}
-      <PropertyList propiedades={propiedades as any} />
+      <PropertyList propiedades={propiedades} />
 
       {/* Sección de contacto */}
       <section className="bg-gray-100 py-16">
