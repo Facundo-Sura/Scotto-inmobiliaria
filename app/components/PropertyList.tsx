@@ -11,16 +11,14 @@ type Propiedad = {
   titulo: string;
   descripcion: string;
   precio: number;
-  tipo: 'casa' | 'departamento' | 'terreno' | 'local' | 'oficina';
+  tipo: 'casa' | 'departamento' | 'terreno' | 'local';
   operacion: 'venta' | 'alquiler';
   direccion: string;
-  ciudad: string;
-  provincia: string;
   habitaciones: number | null;
-  banos: number | null;
   metros: number | null;
   imagen: string | null;
-  fecha_publicacion: string;
+  created_at: string;
+  updated_at: string;
 };
 
 interface PropertyListProps {
@@ -50,10 +48,6 @@ export default function PropertyList({ propiedades }: PropertyListProps) {
       caracteristicas.push(`${propiedad.habitaciones} habitación${propiedad.habitaciones !== 1 ? 'es' : ''}`);
     }
     
-    if (propiedad.banos) {
-      caracteristicas.push(`${propiedad.banos} baño${propiedad.banos !== 1 ? 's' : ''}`);
-    }
-    
     if (propiedad.metros) {
       caracteristicas.push(`${propiedad.metros} m²`);
     }
@@ -65,9 +59,9 @@ export default function PropertyList({ propiedades }: PropertyListProps) {
     return caracteristicas;
   };
 
-  // Función para obtener ubicación completa
-  const getUbicacionCompleta = (propiedad: Propiedad): string => {
-    return `${propiedad.direccion}, ${propiedad.ciudad}, ${propiedad.provincia}`;
+  // Función para obtener ubicación
+  const getUbicacion = (propiedad: Propiedad): string => {
+    return propiedad.direccion;
   };
 
   // Imagen por defecto
@@ -92,7 +86,7 @@ export default function PropertyList({ propiedades }: PropertyListProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {propiedadesFiltradas.map((propiedad) => {
                 const caracteristicas = generarCaracteristicas(propiedad);
-                const ubicacionCompleta = getUbicacionCompleta(propiedad);
+                const ubicacion = getUbicacion(propiedad);
                 const imagenUrl = getImagenUrl(propiedad.imagen);
                 
                 return (
@@ -116,7 +110,7 @@ export default function PropertyList({ propiedades }: PropertyListProps) {
                     </div>
                     <div className="p-6">
                       <h3 className="text-xl font-bold mb-2">{propiedad.titulo}</h3>
-                      <p className="text-gray-600 mb-3 text-sm">{ubicacionCompleta}</p>
+                      <p className="text-gray-600 mb-3 text-sm">{ubicacion}</p>
                       <p className="text-gray-700 mb-4 line-clamp-2">{propiedad.descripcion}</p>
                       
                       <div className="mb-4">
