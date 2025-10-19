@@ -24,14 +24,13 @@ async function getVehiculos(): Promise<Vehiculo[]> {
       next: { revalidate: 60 }
     });
 
-    if (!res.ok) {
-      throw new Error(`Error: ${res.status}`);
-    }
+    if (!res.ok) throw new Error(`Error: ${res.status}`);
 
     const data = await res.json();
     if (!Array.isArray(data)) return [];
 
-    return data.map((item: any, index: number) => ({
+    // Normaliza los datos ANTES de tiparlos como Vehiculo
+    return data.map((item, index) => ({
       id: item.id ?? item._id ?? index,
       titulo: item.titulo ?? item.title ?? '',
       descripcion: item.descripcion ?? item.desc ?? item.description ?? '',
@@ -39,7 +38,6 @@ async function getVehiculos(): Promise<Vehiculo[]> {
       tipo: item.tipo ?? item.operacion ?? 'venta',
       marca: item.marca ?? '',
       modelo: item.modelo ?? '',
-      // aceptar 'anio', 'año' o 'year'
       anio: Number(item.anio ?? item.año ?? item.year) || new Date().getFullYear(),
       kilometraje: Number(item.kilometraje ?? item.km ?? 0) || 0,
       caracteristicas: Array.isArray(item.caracteristicas)
