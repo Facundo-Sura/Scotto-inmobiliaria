@@ -23,7 +23,6 @@ interface Propiedad {
 
 export default function PropiedadDetallePage() {
   const params = useParams();
-  const router = useRouter();
   const id = params.id as string;
 
   const [propiedad, setPropiedad] = useState<Propiedad | null>(null);
