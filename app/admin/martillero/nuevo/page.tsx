@@ -7,10 +7,11 @@ interface VehiculoFormData {
   titulo: string;
   descripcion: string;
   precio: number;
-  tipo: string;
+  categoria: string; // renombrado desde 'tipo' a 'categoria' (tipo = operación)
+  tipo: string; // nuevo: 'venta' | 'subasta' | 'alquiler'
   marca: string;
   modelo: string;
-  año: number;
+  anio: number;
   kilometraje: number;
   caracteristicas: string;
   imagen: string;
@@ -30,10 +31,11 @@ export default function NuevoVehiculoPage() {
     titulo: '',
     descripcion: '',
     precio: 0,
-    tipo: '',
+    categoria: '', // antes 'tipo'
+    tipo: 'venta', // por defecto envío 'venta' (cumple validación backend)
     marca: '',
     modelo: '',
-    año: new Date().getFullYear(),
+    anio: new Date().getFullYear(),
     kilometraje: 0,
     caracteristicas: '',
     imagen: '',
@@ -47,9 +49,12 @@ export default function NuevoVehiculoPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    const numericFields = ['precio', 'anio', 'kilometraje', 'puertas'];
+    const parsed = numericFields.includes(name) ? (value === '' ? '' : Number(value)) : value;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'precio' || name === 'año' || name === 'kilometraje' || name === 'puertas' ? Number(value) : value
+      // @ts-ignore
+      [name]: parsed
     }));
   };
 
@@ -58,28 +63,60 @@ export default function NuevoVehiculoPage() {
     setLoading(true);
     setError('');
 
+    if (!formData.titulo || !formData.marca || !formData.modelo || !formData.categoria || !formData.tipo || (Number(formData.precio) <= 0)) {
+      setError('Complete los campos obligatorios: título, marca, modelo, categoría, tipo y precio mayor a 0.');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/martillero`, {
+      const caracteristicasArr = (typeof formData.caracteristicas === 'string')
+        ? formData.caracteristicas.split(',').map(c => c.trim()).filter(Boolean)
+        : (Array.isArray(formData.caracteristicas) ? formData.caracteristicas : []);
+
+      const payload = {
+        titulo: String(formData.titulo),
+        descripcion: String(formData.descripcion || ''),
+        precio: Number(formData.precio || 0),
+        categoria: String(formData.categoria || ''),
+        tipo: String(formData.tipo || 'venta'),
+        marca: String(formData.marca || ''),
+        modelo: String(formData.modelo || ''),
+        anio: Number(formData.anio || new Date().getFullYear()),
+        // compatibilidad con backend que use 'año'
+        año: Number(formData.anio || new Date().getFullYear()),
+        kilometraje: Number(formData.kilometraje || 0),
+        caracteristicas: caracteristicasArr,
+        imagen: String(formData.imagen || ''),
+        // Enviar detalles tanto dentro de 'detalles' como en top-level (compatibilidad)
+        combustible: String(formData.combustible || ''),
+        transmision: String(formData.transmision || ''),
+        color: String(formData.color || ''),
+        puertas: Number(formData.puertas || 0),
+        motor: String(formData.motor || ''),
+        cilindrada: String(formData.cilindrada || ''),
+        detalles: {
+          combustible: String(formData.combustible || ''),
+          transmision: String(formData.transmision || ''),
+          color: String(formData.color || ''),
+          puertas: Number(formData.puertas || 0),
+          motor: String(formData.motor || ''),
+          cilindrada: String(formData.cilindrada || ''),
+        }
+      };
+
+      console.log('POST /martillero payload:', payload);
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://scotto-inmobiliaria-backend.onrender.com'}/martillero`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          caracteristicas: formData.caracteristicas.split(',').map(c => c.trim()).filter(c => c),
-          detalles: {
-            combustible: formData.combustible,
-            transmision: formData.transmision,
-            color: formData.color,
-            puertas: formData.puertas,
-            motor: formData.motor,
-            cilindrada: formData.cilindrada,
-          }
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
 
+      const resp = await response.json().catch(() => null);
       if (!response.ok) {
-        throw new Error('Error al crear el vehículo');
+        console.error('Server error body:', resp);
+        throw new Error(resp?.message || resp?.error || JSON.stringify(resp) || 'Error al crear el vehículo');
       }
 
       router.push('/admin/martillero');
@@ -127,7 +164,24 @@ export default function NuevoVehiculoPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Tipo</label>
+            <label className="block text-sm font-medium mb-2">Categoría (vehículo)</label>
+            <select
+              name="categoria"
+              value={formData.categoria}
+              onChange={handleInputChange}
+              required
+              className="w-full p-2 border border-gray-300 rounded"
+            >
+              <option value="">Seleccionar categoría</option>
+              <option value="auto">Auto</option>
+              <option value="camioneta">Camioneta</option>
+              <option value="moto">Moto</option>
+              <option value="camion">Camión</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Tipo (operación)</label>
             <select
               name="tipo"
               value={formData.tipo}
@@ -135,11 +189,9 @@ export default function NuevoVehiculoPage() {
               required
               className="w-full p-2 border border-gray-300 rounded"
             >
-              <option value="">Seleccionar tipo</option>
-              <option value="auto">Auto</option>
-              <option value="camioneta">Camioneta</option>
-              <option value="moto">Moto</option>
-              <option value="camion">Camión</option>
+              <option value="venta">Venta</option>
+              <option value="subasta">Subasta</option>
+              <option value="alquiler">Alquiler</option>
             </select>
           </div>
 
@@ -171,8 +223,8 @@ export default function NuevoVehiculoPage() {
             <label className="block text-sm font-medium mb-2">Año</label>
             <input
               type="number"
-              name="año"
-              value={formData.año}
+              name="anio"
+              value={formData.anio}
               onChange={handleInputChange}
               required
               min={1900}

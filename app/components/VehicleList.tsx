@@ -5,16 +5,16 @@ import Link from 'next/link';
 import Image from 'next/image';
 import VehicleFilters from './VehicleFilters';
 
-// Tipo para los vehículos
+// Tipo para los vehículos (coincide con la normalización)
 type Vehiculo = {
-  id: number;
+  id: string | number;
   titulo: string;
   descripcion: string;
   precio: number;
   tipo: string;
   marca: string;
   modelo: string;
-  año: number;
+  anio: number;
   kilometraje: number;
   caracteristicas: string[];
   imagen: string;
@@ -56,13 +56,15 @@ export default function VehicleList({ vehiculos }: VehicleListProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {vehiculosFiltrados.map((vehiculo) => (
                 <div key={vehiculo.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
-                  <Image 
-                    src={vehiculo.imagen} 
-                    alt={vehiculo.titulo}
-                    width={500}
-                    height={300}
-                    className="w-full h-48 object-cover"
-                  />
+                  <div className="relative h-48 w-full">
+                    <Image 
+                      src={vehiculo.imagen} 
+                      alt={vehiculo.titulo}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover"
+                    />
+                  </div>
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="text-xl font-bold">{vehiculo.titulo}</h3>
@@ -71,21 +73,21 @@ export default function VehicleList({ vehiculos }: VehicleListProps) {
                       </span>
                     </div>
                     <div className="flex gap-4 text-sm text-gray-600 mb-4">
-                      <span>{vehiculo.año}</span>
-                      <span>{vehiculo.kilometraje.toLocaleString()} km</span>
+                      <span>{vehiculo.anio}</span>
+                      <span>{(vehiculo.kilometraje || 0).toLocaleString()} km</span>
                     </div>
                     <p className="text-gray-700 mb-4">{vehiculo.descripcion}</p>
                     <div className="mb-4">
                       <h4 className="font-semibold mb-2">Características:</h4>
                       <ul className="grid grid-cols-2 gap-1">
-                        {vehiculo.caracteristicas.map((caracteristica, index) => (
+                        {(vehiculo.caracteristicas ?? []).map((caracteristica, index) => (
                           <li key={index} className="text-sm text-gray-600">• {caracteristica}</li>
                         ))}
                       </ul>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-xl font-bold text-blue-600">
-                        ${vehiculo.precio.toLocaleString()}
+                        ${Number(vehiculo.precio || 0).toLocaleString()}
                       </span>
                       <Link href={`/martillero/${vehiculo.id}`} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
                         Ver detalles

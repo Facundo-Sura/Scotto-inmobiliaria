@@ -1,20 +1,27 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 
 type Vehiculo = {
   id: string;
   titulo: string;
   descripcion: string;
   precio: number;
+  categoria: string;
   tipo: string;
   marca: string;
   modelo: string;
-  año: number;
+  anio: number;
   kilometraje: number;
   caracteristicas: string[];
   imagen: string;
+  combustible: string;
+  transmision: string;
+  color: string;
+  puertas: number;
+  motor: string;
+  cilindrada: string;
 };
 
 export default function EditarVehiculo() {
@@ -22,19 +29,25 @@ export default function EditarVehiculo() {
   const router = useRouter();
   const id = params.id as string;
 
-  // Estado inicial con valores por defecto válidos
   const [formData, setFormData] = useState<Vehiculo>({
     id: '',
     titulo: '',
     descripcion: '',
     precio: 0,
-    tipo: 'auto',
+    categoria: '',
+    tipo: 'venta',
     marca: '',
     modelo: '',
-    año: new Date().getFullYear(),
+    anio: new Date().getFullYear(),
     kilometraje: 0,
     caracteristicas: [],
-    imagen: ''
+    imagen: '',
+    combustible: '',
+    transmision: '',
+    color: '',
+    puertas: 4,
+    motor: '',
+    cilindrada: '',
   });
 
   const [nuevaCaracteristica, setNuevaCaracteristica] = useState('');
@@ -46,60 +59,58 @@ export default function EditarVehiculo() {
     const fetchVehiculo = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`https://scotto-inmobiliaria-backend.onrender.com/martillero/${id}`);
-        
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://scotto-inmobiliaria-backend.onrender.com';
+        const res = await fetch(`${apiUrl}/martillero/${id}`);
         if (!res.ok) throw new Error('Error al cargar el vehículo');
-        
-        const data = await res.json();
-        
-        // Asegurar que todos los campos tengan valores válidos
+        const raw = await res.json();
         setFormData({
-          id: data.id || '',
-          titulo: data.titulo || '',
-          descripcion: data.descripcion || '',
-          precio: data.precio || 0,
-          tipo: data.tipo || 'auto',
-          marca: data.marca || '',
-          modelo: data.modelo || '',
-          año: data.año || new Date().getFullYear(),
-          kilometraje: data.kilometraje || 0,
-          caracteristicas: data.caracteristicas || [],
-          imagen: data.imagen || ''
+          id: raw.id ?? raw._id ?? id ?? '',
+          titulo: raw.titulo ?? '',
+          descripcion: raw.descripcion ?? '',
+          precio: Number(raw.precio ?? 0),
+          categoria: raw.categoria ?? '',
+          tipo: raw.tipo ?? 'venta',
+          marca: raw.marca ?? '',
+          modelo: raw.modelo ?? '',
+          anio: Number(raw.anio ?? raw.año ?? new Date().getFullYear()),
+          kilometraje: Number(raw.kilometraje ?? 0),
+          caracteristicas: Array.isArray(raw.caracteristicas)
+            ? raw.caracteristicas
+            : (typeof raw.caracteristicas === 'string' ? raw.caracteristicas.split(',').map((s: string) => s.trim()).filter(Boolean) : []),
+          imagen: raw.imagen ?? '',
+          combustible: raw.combustible ?? raw.detalles?.combustible ?? '',
+          transmision: raw.transmision ?? raw.detalles?.transmision ?? '',
+          color: raw.color ?? raw.detalles?.color ?? '',
+          puertas: Number(raw.puertas ?? raw.detalles?.puertas ?? 4),
+          motor: raw.motor ?? raw.detalles?.motor ?? '',
+          cilindrada: raw.cilindrada ?? raw.detalles?.cilindrada ?? '',
         });
       } catch (err) {
         setError('No se pudo cargar el vehículo');
-        console.error('Error:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    if (id) {
-      fetchVehiculo();
-    }
+    if (id) fetchVehiculo();
   }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    
-    if (name === 'año' || name === 'kilometraje' || name === 'precio') {
-      setFormData(prev => ({
-        ...prev,
-        [name]: parseInt(value) || 0
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
+    const numericFields = ['anio', 'kilometraje', 'precio', 'puertas'];
+    const parsed = numericFields.includes(name) ? (value === '' ? 0 : Number(value)) : value;
+    setFormData(prev => ({
+      ...prev,
+      [name]: parsed
+    }));
   };
 
   const agregarCaracteristica = () => {
-    if (nuevaCaracteristica.trim() && !formData.caracteristicas.includes(nuevaCaracteristica.trim())) {
+    const v = nuevaCaracteristica.trim();
+    if (v && !formData.caracteristicas.includes(v)) {
       setFormData(prev => ({
         ...prev,
-        caracteristicas: [...prev.caracteristicas, nuevaCaracteristica.trim()]
+        caracteristicas: [...prev.caracteristicas, v]
       }));
       setNuevaCaracteristica('');
     }
@@ -117,27 +128,59 @@ export default function EditarVehiculo() {
     setSaving(true);
     setError('');
 
+    if (!formData.titulo || !formData.marca || !formData.modelo || !formData.categoria || !formData.tipo || formData.precio <= 0) {
+      setError('Complete los campos obligatorios: título, marca, modelo, categoría, tipo y precio mayor a 0.');
+      setSaving(false);
+      return;
+    }
+
     try {
-      const res = await fetch(`https://scotto-inmobiliaria-backend.onrender.com/martillero/${id}`, {
+      const payload = {
+        titulo: String(formData.titulo),
+        descripcion: String(formData.descripcion || ''),
+        precio: Number(formData.precio || 0),
+        categoria: String(formData.categoria || ''),
+        tipo: String(formData.tipo || 'venta'),
+        marca: String(formData.marca || ''),
+        modelo: String(formData.modelo || ''),
+        anio: Number(formData.anio || new Date().getFullYear()),
+        año: Number(formData.anio || new Date().getFullYear()),
+        kilometraje: Number(formData.kilometraje || 0),
+        caracteristicas: Array.isArray(formData.caracteristicas) ? formData.caracteristicas : [],
+        imagen: String(formData.imagen || ''),
+        combustible: String(formData.combustible || ''),
+        transmision: String(formData.transmision || ''),
+        color: String(formData.color || ''),
+        puertas: Number(formData.puertas || 0),
+        motor: String(formData.motor || ''),
+        cilindrada: String(formData.cilindrada || ''),
+        detalles: {
+          combustible: String(formData.combustible || ''),
+          transmision: String(formData.transmision || ''),
+          color: String(formData.color || ''),
+          puertas: Number(formData.puertas || 0),
+          motor: String(formData.motor || ''),
+          cilindrada: String(formData.cilindrada || ''),
+        }
+      };
+
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://scotto-inmobiliaria-backend.onrender.com';
+      const res = await fetch(`${apiUrl}/martillero/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
 
+      const respJson = await res.json().catch(() => null);
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Error al actualizar el vehículo');
+        setError(respJson?.message || respJson?.error || 'Error al actualizar el vehículo');
+        return;
       }
 
-      const updatedData = await res.json();
-      alert('Vehículo actualizado correctamente');
       router.push('/admin/martillero');
-      router.refresh(); // Forzar recarga de la página
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al actualizar el vehículo');
-      console.error('Error:', err);
     } finally {
       setSaving(false);
     }
@@ -153,213 +196,109 @@ export default function EditarVehiculo() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6">Editar Vehículo</h1>
-      
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
         </div>
       )}
-
-      <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Columna izquierda */}
-          <div className="space-y-4">
-            <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Título *
-              </label>
-              <input
-                type="text"
-                name="titulo"
-                value={formData.titulo}
-                onChange={handleChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Descripción *
-              </label>
-              <textarea
-                name="descripcion"
-                value={formData.descripcion}
-                onChange={handleChange}
-                rows={4}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Precio *
-              </label>
-              <input
-                type="number"
-                name="precio"
-                value={formData.precio}
-                onChange={handleChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                required
-                min="0"
-              />
-            </div>
-
-            <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Tipo *
-              </label>
-              <select
-                name="tipo"
-                value={formData.tipo}
-                onChange={handleChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              >
-                <option value="auto">Auto</option>
-                <option value="camioneta">Camioneta</option>
-                <option value="moto">Moto</option>
-                <option value="camion">Camión</option>
-              </select>
-            </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Título</label>
+            <input type="text" name="titulo" value={formData.titulo} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
           </div>
-
-          {/* Columna derecha */}
-          <div className="space-y-4">
-            <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Marca *
-              </label>
-              <input
-                type="text"
-                name="marca"
-                value={formData.marca}
-                onChange={handleChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Modelo *
-              </label>
-              <input
-                type="text"
-                name="modelo"
-                value={formData.modelo}
-                onChange={handleChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                  Año *
-                </label>
-                <input
-                  type="number"
-                  name="año"
-                  value={formData.año}
-                  onChange={handleChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  required
-                  min="1900"
-                  max={new Date().getFullYear() + 1}
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                  Kilometraje
-                </label>
-                <input
-                  type="number"
-                  name="kilometraje"
-                  value={formData.kilometraje}
-                  onChange={handleChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  min="0"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                URL de Imagen *
-              </label>
-              <input
-                type="url"
-                name="imagen"
-                value={formData.imagen}
-                onChange={handleChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                required
-                placeholder="https://ejemplo.com/imagen.jpg"
-              />
-            </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Descripción</label>
+            <textarea name="descripcion" value={formData.descripcion} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Precio</label>
+            <input type="number" name="precio" value={formData.precio} onChange={handleChange} required min={0} className="w-full p-2 border border-gray-300 rounded" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Categoría</label>
+            <select name="categoria" value={formData.categoria} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded">
+              <option value="">Seleccionar categoría</option>
+              <option value="auto">Auto</option>
+              <option value="camioneta">Camioneta</option>
+              <option value="moto">Moto</option>
+              <option value="camion">Camión</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Tipo</label>
+            <select name="tipo" value={formData.tipo} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded">
+              <option value="venta">Venta</option>
+              <option value="subasta">Subasta</option>
+              <option value="alquiler">Alquiler</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Marca</label>
+            <input type="text" name="marca" value={formData.marca} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Modelo</label>
+            <input type="text" name="modelo" value={formData.modelo} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Año</label>
+            <input type="number" name="anio" value={formData.anio} onChange={handleChange} required min={1900} max={new Date().getFullYear() + 1} className="w-full p-2 border border-gray-300 rounded" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Kilometraje</label>
+            <input type="number" name="kilometraje" value={formData.kilometraje} onChange={handleChange} min={0} className="w-full p-2 border border-gray-300 rounded" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Imagen (URL)</label>
+            <input type="url" name="imagen" value={formData.imagen} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Combustible</label>
+            <input type="text" name="combustible" value={formData.combustible} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Transmisión</label>
+            <input type="text" name="transmision" value={formData.transmision} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Color</label>
+            <input type="text" name="color" value={formData.color} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Puertas</label>
+            <input type="number" name="puertas" value={formData.puertas} onChange={handleChange} min={2} max={5} className="w-full p-2 border border-gray-300 rounded" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Motor</label>
+            <input type="text" name="motor" value={formData.motor} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Cilindrada</label>
+            <input type="text" name="cilindrada" value={formData.cilindrada} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded" />
           </div>
         </div>
-
         {/* Características */}
         <div className="mt-6">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Características
-          </label>
+          <label className="block text-sm font-medium mb-2">Características</label>
           <div className="flex gap-2 mb-2">
-            <input
-              type="text"
-              value={nuevaCaracteristica}
-              onChange={(e) => setNuevaCaracteristica(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="Nueva característica"
-              onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), agregarCaracteristica())}
-            />
-            <button
-              type="button"
-              onClick={agregarCaracteristica}
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            >
-              Agregar
-            </button>
+            <input type="text" value={nuevaCaracteristica} onChange={(e) => setNuevaCaracteristica(e.target.value)} placeholder="Nueva característica" className="w-full p-2 border border-gray-300 rounded" />
+            <button type="button" onClick={agregarCaracteristica} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Agregar</button>
           </div>
           <div className="flex flex-wrap gap-2">
             {formData.caracteristicas.map((caracteristica, index) => (
-              <span
-                key={index}
-                className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full flex items-center"
-              >
+              <span key={index} className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full flex items-center">
                 {caracteristica}
-                <button
-                  type="button"
-                  onClick={() => eliminarCaracteristica(index)}
-                  className="ml-2 text-red-500 hover:text-red-700"
-                >
-                  ×
-                </button>
+                <button type="button" onClick={() => eliminarCaracteristica(index)} className="ml-2 text-red-500 hover:text-red-700">×</button>
               </span>
             ))}
           </div>
         </div>
-
         <div className="flex items-center justify-between mt-8">
-          <button
-            type="button"
-            onClick={() => router.push('/admin/martillero')}
-            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          >
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            disabled={saving}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
-          >
+          <button type="button" onClick={() => router.push('/admin/martillero')} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Cancelar</button>
+          <button type="submit" disabled={saving} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50">
             {saving ? 'Guardando...' : 'Actualizar Vehículo'}
           </button>
         </div>

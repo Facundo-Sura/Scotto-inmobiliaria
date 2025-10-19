@@ -1,35 +1,52 @@
 import React from "react";
 import VehicleList from "../components/VehicleList";
 
-// Tipo para los vehículos
+// Tipo para los vehículos (usar 'anio' internamente)
 type Vehiculo = {
-  id: number;
+  id: string | number;
   titulo: string;
   descripcion: string;
   precio: number;
   tipo: string;
   marca: string;
   modelo: string;
-  año: number;
+  anio: number;
   kilometraje: number;
   caracteristicas: string[];
   imagen: string;
 };
 
-// Función para obtener los vehículos desde el backend
+// Función para obtener y normalizar los vehículos desde el backend
 async function getVehiculos(): Promise<Vehiculo[]> {
   try {
     const res = await fetch('https://scotto-inmobiliaria-backend.onrender.com/martillero', {
       cache: 'no-store',
       next: { revalidate: 60 }
     });
-    
+
     if (!res.ok) {
       throw new Error(`Error: ${res.status}`);
     }
-    
+
     const data = await res.json();
-    return data;
+    if (!Array.isArray(data)) return [];
+
+    return data.map((item: any, index: number) => ({
+      id: item.id ?? item._id ?? index,
+      titulo: item.titulo ?? item.title ?? '',
+      descripcion: item.descripcion ?? item.desc ?? item.description ?? '',
+      precio: Number(item.precio ?? 0),
+      tipo: item.tipo ?? item.operacion ?? 'venta',
+      marca: item.marca ?? '',
+      modelo: item.modelo ?? '',
+      // aceptar 'anio', 'año' o 'year'
+      anio: Number(item.anio ?? item.año ?? item.year) || new Date().getFullYear(),
+      kilometraje: Number(item.kilometraje ?? item.km ?? 0) || 0,
+      caracteristicas: Array.isArray(item.caracteristicas)
+        ? item.caracteristicas
+        : (typeof item.caracteristicas === 'string' ? item.caracteristicas.split(',').map((s: string) => s.trim()).filter(Boolean) : []),
+      imagen: item.imagen ?? (Array.isArray(item.imagenes) && item.imagenes[0]) ?? '/placeholder.png',
+    }));
   } catch (error) {
     console.error("Error al cargar los datos de vehículos:", error);
     return [];
@@ -37,7 +54,6 @@ async function getVehiculos(): Promise<Vehiculo[]> {
 }
 
 export default async function MartilleroPage() {
-  // Obtener los vehículos desde la API
   const vehiculos = await getVehiculos();
 
   return (
