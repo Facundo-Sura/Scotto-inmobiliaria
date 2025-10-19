@@ -48,13 +48,14 @@ export default function NuevoVehiculoPage() {
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+    const name = e.target.name as keyof VehiculoFormData;
+    const value = e.target.value;
     const numericFields = ['precio', 'anio', 'kilometraje', 'puertas'];
-    const parsed = numericFields.includes(name) ? (value === '' ? '' : Number(value)) : value;
+    const isNumeric = numericFields.includes(name as string);
+    const parsed = isNumeric ? (value === '' ? 0 : Number(value)) : value;
     setFormData(prev => ({
       ...prev,
-      // @ts-ignore
-      [name]: parsed
+      [name]: parsed as any
     }));
   };
 
