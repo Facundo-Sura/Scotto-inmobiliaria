@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -30,7 +30,6 @@ interface Vehiculo {
 
 export default function VehiculoDetallePage() {
   const params = useParams();
-  const router = useRouter();
   const id = params?.id as string;
 
   const [vehiculo, setVehiculo] = useState<Vehiculo | null>(null);
