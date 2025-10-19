@@ -8,16 +8,14 @@ type Propiedad = {
   titulo: string;
   descripcion: string;
   precio: number;
-  tipo: 'casa' | 'departamento' | 'terreno' | 'local' | 'oficina'; // Actualizado según ENUM
+  tipo: 'casa' | 'departamento' | 'terreno' | 'local'; // Actualizado según ENUM (sin oficina)
   operacion: 'venta' | 'alquiler'; // Cambiado de 'categoria' a 'operacion'
   direccion: string;
-  ciudad: string;
-  provincia: string;
   habitaciones: number | null;
-  banos: number | null;
   metros: number | null;
   imagen: string | null;
-  fecha_publicacion: string;
+  created_at: string;
+  updated_at: string;
 };
 
 // Función para obtener las propiedades desde el backend
@@ -59,7 +57,7 @@ export default async function InmobiliariaPage() {
       </section>
 
       {/* Componente de filtros y listado de propiedades */}
-      <PropertyList propiedades={propiedades} />
+      <PropertyList propiedades={propiedades as any} />
 
       {/* Sección de contacto */}
       <section className="bg-gray-100 py-16">

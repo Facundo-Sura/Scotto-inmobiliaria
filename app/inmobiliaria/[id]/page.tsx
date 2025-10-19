@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
-import Image from 'next/image';
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
 
 // Tipo para las propiedades
 interface Propiedad {
@@ -11,18 +11,14 @@ interface Propiedad {
   titulo: string;
   descripcion: string;
   precio: number;
-  tipo: 'casa' | 'departamento' | 'terreno' | 'local' | 'oficina';
-  operacion: 'venta' | 'alquiler';
+  tipo: "casa" | "departamento" | "terreno" | "local";
+  operacion: "venta" | "alquiler";
   direccion: string;
-  ciudad: string;
-  provincia: string;
   habitaciones: number | null;
-  banos: number | null;
   metros: number | null;
   imagen: string | null;
-  fecha_publicacion: string;
-  imagenes?: string[];
-  caracteristicas?: string[];
+  created_at: string;
+  updated_at: string;
 }
 
 export default function PropiedadDetallePage() {
@@ -32,22 +28,24 @@ export default function PropiedadDetallePage() {
 
   const [propiedad, setPropiedad] = useState<Propiedad | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchPropiedad = async () => {
       try {
         setLoading(true);
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://scotto-inmobiliaria-backend.onrender.com';
+        const apiUrl =
+          process.env.NEXT_PUBLIC_API_URL ||
+          "https://scotto-inmobiliaria-backend.onrender.com";
         const res = await fetch(`${apiUrl}/inmobiliaria/${id}`);
-        
-        if (!res.ok) throw new Error('Error al cargar la propiedad');
-        
+
+        if (!res.ok) throw new Error("Error al cargar la propiedad");
+
         const data = await res.json();
         setPropiedad(data);
       } catch (err) {
-        setError('No se pudo cargar la propiedad');
-        console.error('Error:', err);
+        setError("No se pudo cargar la propiedad");
+        console.error("Error:", err);
       } finally {
         setLoading(false);
       }
@@ -71,9 +69,9 @@ export default function PropiedadDetallePage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error || 'Propiedad no encontrada'}
+          {error || "Propiedad no encontrada"}
         </div>
-        <Link 
+        <Link
           href="/inmobiliaria"
           className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300"
         >
@@ -84,9 +82,9 @@ export default function PropiedadDetallePage() {
   }
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS'
+    return new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
     }).format(price);
   };
 
@@ -127,7 +125,7 @@ export default function PropiedadDetallePage() {
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
               {propiedad.titulo}
             </h1>
-            
+
             <div className="bg-white rounded-lg shadow-md p-6 mb-6">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-2xl font-bold text-red-600">
@@ -138,36 +136,34 @@ export default function PropiedadDetallePage() {
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                 {propiedad.habitaciones && (
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-900">{propiedad.habitaciones}</div>
+                    <div className="text-2xl font-bold text-gray-900">
+                      {propiedad.habitaciones}
+                    </div>
                     <div className="text-sm text-gray-600">Habitaciones</div>
-                  </div>
-                )}
-                {propiedad.banos && (
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-900">{propiedad.banos}</div>
-                    <div className="text-sm text-gray-600">Baños</div>
                   </div>
                 )}
                 {propiedad.metros && (
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-900">{propiedad.metros}m²</div>
+                    <div className="text-2xl font-bold text-gray-900">
+                      {propiedad.metros}m²
+                    </div>
                     <div className="text-sm text-gray-600">Superficie</div>
                   </div>
                 )}
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">{propiedad.tipo}</div>
+                  <div className="text-2xl font-bold text-gray-900">
+                    {propiedad.tipo}
+                  </div>
                   <div className="text-sm text-gray-600">Tipo</div>
                 </div>
               </div>
 
               <div className="mb-6">
                 <h3 className="text-lg font-semibold mb-3">Ubicación</h3>
-                <p className="text-gray-700">
-                  {propiedad.direccion}, {propiedad.ciudad}, {propiedad.provincia}
-                </p>
+                <p className="text-gray-700">{propiedad.direccion}</p>
               </div>
 
               <div>
@@ -177,30 +173,15 @@ export default function PropiedadDetallePage() {
                 </p>
               </div>
             </div>
-
-            {/* Características */}
-            {propiedad.caracteristicas && propiedad.caracteristicas.length > 0 && (
-              <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                <h3 className="text-lg font-semibold mb-4">Características</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {propiedad.caracteristicas.map((caracteristica, index) => (
-                    <span
-                      key={index}
-                      className="bg-gray-100 text-gray-800 text-sm px-3 py-1 rounded"
-                    >
-                      {caracteristica}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Columna derecha - Contacto */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
-              <h3 className="text-xl font-semibold mb-4">¿Te interesa esta propiedad?</h3>
-              
+              <h3 className="text-xl font-semibold mb-4">
+                ¿Te interesa esta propiedad?
+              </h3>
+
               <div className="space-y-4">
                 <Link
                   href="https://mail.google.com/mail/?view=cm&fs=1&to=inmobiliariascotto@hotmail.com&su=Consulta%20sobre%20propiedad&body=Hola,%20me%20interesa%20la%20propiedad:%20PROPIEDAD_TITULO"
@@ -210,7 +191,7 @@ export default function PropiedadDetallePage() {
                 >
                   Contactar por email
                 </Link>
-                
+
                 <Link
                   href="https://wa.me/5493510000000?text=Hola,%20me%20interesa%20la%20propiedad:%20PROPIEDAD_TITULO"
                   target="_blank"
@@ -224,7 +205,7 @@ export default function PropiedadDetallePage() {
               <div className="mt-6 pt-6 border-t border-gray-200">
                 <h4 className="font-semibold mb-2">Publicado el:</h4>
                 <p className="text-gray-600">
-                  {new Date(propiedad.fecha_publicacion).toLocaleDateString('es-AR')}
+                  {new Date(propiedad.created_at).toLocaleDateString("es-AR")}
                 </p>
               </div>
             </div>
