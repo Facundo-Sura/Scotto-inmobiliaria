@@ -9,16 +9,14 @@ type Propiedad = {
   titulo: string;
   descripcion: string;
   precio: number;
-  tipo: 'casa' | 'departamento' | 'terreno' | 'local' | 'oficina';
+  tipo: 'casa' | 'departamento' | 'terreno' | 'local';
   operacion: 'venta' | 'alquiler';
   direccion: string;
-  ciudad: string;
-  provincia: string;
   habitaciones: number | null;
-  banos: number | null;
   metros: number | null;
   imagen: string | null;
-  fecha_publicacion: string;
+  created_at: string;
+  updated_at: string;
 };
 
 export default function PropiedadesAdmin() {
@@ -122,7 +120,7 @@ export default function PropiedadesAdmin() {
                 Operación
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Ubicación
+                Dirección
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Precio
@@ -145,7 +143,7 @@ export default function PropiedadesAdmin() {
                   {propiedad.operacion}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {propiedad.ciudad}, {propiedad.provincia}
+                  {propiedad.direccion}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   ${propiedad.precio.toLocaleString()}

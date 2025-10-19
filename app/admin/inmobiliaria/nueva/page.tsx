@@ -8,18 +8,11 @@ interface PropiedadFormData {
   descripcion: string;
   precio: number;
   tipo: string;
-  categoria: string;
-  ubicacion: string;
-  caracteristicas: string;
+  operacion: string;
+  direccion: string;
   imagen: string;
-  superficie: string;
-  terreno: string;
-  antiguedad: string;
-  orientacion: string;
-  estado: string;
-  servicios: string;
-  ambientes: number;
-  cocheras: number;
+  metros: number;
+  habitaciones: number;
 }
 
 export default function NuevaPropiedadPage() {
@@ -31,25 +24,18 @@ export default function NuevaPropiedadPage() {
     descripcion: '',
     precio: 0,
     tipo: '',
-    categoria: '',
-    ubicacion: '',
-    caracteristicas: '',
+    operacion: '',
+    direccion: '',
     imagen: '',
-    superficie: '',
-    terreno: '',
-    antiguedad: '',
-    orientacion: '',
-    estado: '',
-    servicios: '',
-    ambientes: 0,
-    cocheras: 0,
+    metros: 0,
+    habitaciones: 0,
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'precio' || name === 'ambientes' || name === 'cocheras' ? Number(value) : value
+      [name]: name === 'precio' || name === 'metros' || name === 'habitaciones' ? Number(value) : value
     }));
   };
 
@@ -65,19 +51,15 @@ export default function NuevaPropiedadPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ...formData,
-          caracteristicas: formData.caracteristicas.split(',').map(c => c.trim()).filter(c => c),
-          servicios: formData.servicios.split(',').map(s => s.trim()).filter(s => s),
-          detalles: {
-            superficie: formData.superficie,
-            terreno: formData.terreno,
-            antiguedad: formData.antiguedad,
-            orientacion: formData.orientacion,
-            estado: formData.estado,
-            servicios: formData.servicios.split(',').map(s => s.trim()).filter(s => s),
-            ambientes: formData.ambientes,
-            cocheras: formData.cocheras,
-          }
+          titulo: formData.titulo,
+          descripcion: formData.descripcion,
+          precio: formData.precio,
+          direccion: formData.direccion,
+          tipo: formData.tipo,
+          operacion: formData.operacion,
+          habitaciones: formData.habitaciones,
+          metros: formData.metros,
+          imagen: formData.imagen
         }),
       });
 
@@ -147,26 +129,26 @@ export default function NuevaPropiedadPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Categoría</label>
+            <label className="block text-sm font-medium mb-2">Operación</label>
             <select
-              name="categoria"
-              value={formData.categoria}
+              name="operacion"
+              value={formData.operacion}
               onChange={handleInputChange}
               required
               className="w-full p-2 border border-gray-300 rounded"
             >
-              <option value="">Seleccionar categoría</option>
+              <option value="">Seleccionar operación</option>
               <option value="venta">Venta</option>
               <option value="alquiler">Alquiler</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Ubicación</label>
+            <label className="block text-sm font-medium mb-2">Dirección</label>
             <input
               type="text"
-              name="ubicacion"
-              value={formData.ubicacion}
+              name="direccion"
+              value={formData.direccion}
               onChange={handleInputChange}
               required
               className="w-full p-2 border border-gray-300 rounded"
@@ -186,82 +168,22 @@ export default function NuevaPropiedadPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Superficie</label>
-            <input
-              type="text"
-              name="superficie"
-              value={formData.superficie}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">Terreno</label>
-            <input
-              type="text"
-              name="terreno"
-              value={formData.terreno}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">Antigüedad</label>
-            <input
-              type="text"
-              name="antiguedad"
-              value={formData.antiguedad}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">Orientación</label>
-            <input
-              type="text"
-              name="orientacion"
-              value={formData.orientacion}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">Estado</label>
-            <select
-              name="estado"
-              value={formData.estado}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded"
-            >
-              <option value="">Seleccionar estado</option>
-              <option value="excelente">Excelente</option>
-              <option value="muy-bueno">Muy Bueno</option>
-              <option value="bueno">Bueno</option>
-              <option value="a-reciclar">A Reciclar</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">Ambientes</label>
+            <label className="block text-sm font-medium mb-2">Metros cuadrados</label>
             <input
               type="number"
-              name="ambientes"
-              value={formData.ambientes}
+              name="metros"
+              value={formData.metros}
               onChange={handleInputChange}
               className="w-full p-2 border border-gray-300 rounded"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Cocheras</label>
+            <label className="block text-sm font-medium mb-2">Habitaciones</label>
             <input
               type="number"
-              name="cocheras"
-              value={formData.cocheras}
+              name="habitaciones"
+              value={formData.habitaciones}
               onChange={handleInputChange}
               className="w-full p-2 border border-gray-300 rounded"
             />
@@ -276,30 +198,6 @@ export default function NuevaPropiedadPage() {
             onChange={handleInputChange}
             rows={4}
             className="w-full p-2 border border-gray-300 rounded"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-2">Características (separadas por comas)</label>
-          <textarea
-            name="caracteristicas"
-            value={formData.caracteristicas}
-            onChange={handleInputChange}
-            rows={2}
-            className="w-full p-2 border border-gray-300 rounded"
-            placeholder="pileta, jardín, garage, etc."
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-2">Servicios (separados por comas)</label>
-          <textarea
-            name="servicios"
-            value={formData.servicios}
-            onChange={handleInputChange}
-            rows={2}
-            className="w-full p-2 border border-gray-300 rounded"
-            placeholder="agua, gas, luz, internet, etc."
           />
         </div>
 

@@ -1,22 +1,21 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 
 type Propiedad = {
   id: string;
   titulo: string;
   descripcion: string;
   precio: number;
-  tipo: 'casa' | 'departamento' | 'terreno' | 'local' | 'oficina';
-  operacion: 'venta' | 'alquiler';
+  tipo: "casa" | "departamento" | "terreno" | "local";
+  operacion: "venta" | "alquiler";
   direccion: string;
-  ciudad: string;
-  provincia: string;
   habitaciones: number | null;
-  banos: number | null;
   metros: number | null;
   imagen: string | null;
+  created_at: string;
+  updated_at: string;
 };
 
 export default function EditarPropiedad() {
@@ -25,39 +24,40 @@ export default function EditarPropiedad() {
   const id = params.id as string;
 
   const [formData, setFormData] = useState<Propiedad>({
-    id: '',
-    titulo: '',
-    descripcion: '',
+    id: "",
+    titulo: "",
+    descripcion: "",
     precio: 0,
-    tipo: 'casa',
-    operacion: 'venta',
-    direccion: '',
-    ciudad: '',
-    provincia: '',
+    tipo: "casa",
+    operacion: "venta",
+    direccion: "",
     habitaciones: null,
-    banos: null,
     metros: null,
-    imagen: null
+    imagen: null,
+    created_at: "",
+    updated_at: "",
   });
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   // Cargar datos de la propiedad
   useEffect(() => {
     const fetchPropiedad = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`https://scotto-inmobiliaria-backend.onrender.com/inmobiliaria/${id}`);
-        
-        if (!res.ok) throw new Error('Error al cargar la propiedad');
-        
+        const res = await fetch(
+          `https://scotto-inmobiliaria-backend.onrender.com/inmobiliaria/${id}`
+        );
+
+        if (!res.ok) throw new Error("Error al cargar la propiedad");
+
         const data = await res.json();
         setFormData(data);
       } catch (err) {
-        setError('No se pudo cargar la propiedad');
-        console.error('Error:', err);
+        setError("No se pudo cargar la propiedad");
+        console.error("Error:", err);
       } finally {
         setLoading(false);
       }
@@ -68,23 +68,27 @@ export default function EditarPropiedad() {
     }
   }, [id]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
-    
-    if (name === 'habitaciones' || name === 'banos' || name === 'metros') {
-      setFormData(prev => ({
+
+    if (name === "habitaciones" || name === "metros") {
+      setFormData((prev) => ({
         ...prev,
-        [name]: value === '' ? null : parseInt(value)
+        [name]: value === "" ? null : parseInt(value),
       }));
-    } else if (name === 'precio') {
-      setFormData(prev => ({
+    } else if (name === "precio") {
+      setFormData((prev) => ({
         ...prev,
-        [name]: parseFloat(value) || 0
+        [name]: parseFloat(value) || 0,
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
       }));
     }
   };
@@ -92,24 +96,27 @@ export default function EditarPropiedad() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    setError('');
+    setError("");
 
     try {
-      const res = await fetch(`https://scotto-inmobiliaria-backend.onrender.com/inmobiliaria/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      const res = await fetch(
+        `https://scotto-inmobiliaria-backend.onrender.com/inmobiliaria/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
-      if (!res.ok) throw new Error('Error al actualizar la propiedad');
+      if (!res.ok) throw new Error("Error al actualizar la propiedad");
 
-      alert('Propiedad actualizada correctamente');
-      router.push('/admin/inmobiliaria');
+      alert("Propiedad actualizada correctamente");
+      router.push("/admin/inmobiliaria");
     } catch (err) {
-      setError('Error al actualizar la propiedad');
-      console.error('Error:', err);
+      setError("Error al actualizar la propiedad");
+      console.error("Error:", err);
     } finally {
       setSaving(false);
     }
@@ -127,14 +134,17 @@ export default function EditarPropiedad() {
   return (
     <div className="max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Editar Propiedad</h1>
-      
+
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Columna izquierda */}
           <div className="space-y-4">
@@ -211,7 +221,6 @@ export default function EditarPropiedad() {
                 <option value="departamento">Departamento</option>
                 <option value="terreno">Terreno</option>
                 <option value="local">Local Comercial</option>
-                <option value="oficina">Oficina</option>
               </select>
             </div>
           </div>
@@ -231,36 +240,7 @@ export default function EditarPropiedad() {
                 required
               />
             </div>
-
-            <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Ciudad *
-              </label>
-              <input
-                type="text"
-                name="ciudad"
-                value={formData.ciudad}
-                onChange={handleChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Provincia *
-              </label>
-              <input
-                type="text"
-                name="provincia"
-                value={formData.provincia}
-                onChange={handleChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-gray-700 text-sm font-bold mb-2">
                   Habitaciones
@@ -268,27 +248,12 @@ export default function EditarPropiedad() {
                 <input
                   type="number"
                   name="habitaciones"
-                  value={formData.habitaciones || ''}
+                  value={formData.habitaciones || ""}
                   onChange={handleChange}
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                   min="0"
                 />
               </div>
-
-              <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                  Baños
-                </label>
-                <input
-                  type="number"
-                  name="banos"
-                  value={formData.banos || ''}
-                  onChange={handleChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  min="0"
-                />
-              </div>
-
               <div>
                 <label className="block text-gray-700 text-sm font-bold mb-2">
                   Metros²
@@ -296,14 +261,13 @@ export default function EditarPropiedad() {
                 <input
                   type="number"
                   name="metros"
-                  value={formData.metros || ''}
+                  value={formData.metros || ""}
                   onChange={handleChange}
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                   min="0"
                 />
               </div>
             </div>
-
             <div>
               <label className="block text-gray-700 text-sm font-bold mb-2">
                 URL de Imagen
@@ -311,7 +275,7 @@ export default function EditarPropiedad() {
               <input
                 type="url"
                 name="imagen"
-                value={formData.imagen || ''}
+                value={formData.imagen || ""}
                 onChange={handleChange}
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 placeholder="https://ejemplo.com/imagen.jpg"
@@ -323,7 +287,7 @@ export default function EditarPropiedad() {
         <div className="flex items-center justify-between mt-8">
           <button
             type="button"
-            onClick={() => router.push('/admin/inmobiliaria')}
+            onClick={() => router.push("/admin/inmobiliaria")}
             className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           >
             Cancelar
@@ -333,7 +297,7 @@ export default function EditarPropiedad() {
             disabled={saving}
             className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
           >
-            {saving ? 'Guardando...' : 'Actualizar Propiedad'}
+            {saving ? "Guardando..." : "Actualizar Propiedad"}
           </button>
         </div>
       </form>
