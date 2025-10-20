@@ -55,7 +55,7 @@ export default function NuevoVehiculoPage() {
     const parsed = isNumeric ? (value === '' ? 0 : Number(value)) : value;
     setFormData(prev => ({
       ...prev,
-      [name]: parsed as never,
+      [name]: parsed
     }));
   };
 
