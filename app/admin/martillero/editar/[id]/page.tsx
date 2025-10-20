@@ -86,6 +86,7 @@ export default function EditarVehiculo() {
           cilindrada: raw.cilindrada ?? raw.detalles?.cilindrada ?? '',
         });
       } catch (error) {
+        console.error(error);
         setError('No se pudo cargar el vehículo');
       } finally {
         setLoading(false);
