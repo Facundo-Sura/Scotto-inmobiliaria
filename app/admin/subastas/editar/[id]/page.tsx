@@ -8,6 +8,7 @@ type Subasta = {
   titulo: string;
   descripcion: string;
   imagen: string;
+  imagenes: string[];
   precioInicial: number;
   precioActual: number;
   fechaInicio: string;
@@ -15,6 +16,8 @@ type Subasta = {
   estado: 'activa' | 'proximamente' | 'finalizada';
   categoria: string;
   ofertas: number;
+  imagen_public_id?: string;
+  imagenes_public_ids?: string[];
 };
 
 export default function EditarSubasta() {
@@ -27,6 +30,7 @@ export default function EditarSubasta() {
     titulo: '',
     descripcion: '',
     imagen: '',
+    imagenes: [],
     precioInicial: 0,
     precioActual: 0,
     fechaInicio: '',
@@ -36,6 +40,7 @@ export default function EditarSubasta() {
     ofertas: 0
   });
 
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -49,11 +54,11 @@ export default function EditarSubasta() {
         if (!res.ok) throw new Error('Error al cargar la subasta');
         
         const data = await res.json();
-        // Formatear fechas para input datetime-local
         const subastaFormateada = {
           ...data,
-          fechaInicio: data.fechaInicio ? data.fechaInicio.split('T')[0] : '',
-          fechaFin: data.fechaFin ? data.fechaFin.split('T')[0] : ''
+          fechaInicio: data.inicioFecha ? new Date(data.inicioFecha).toISOString().split('T')[0] : '',
+          fechaFin: data.finFecha ? new Date(data.finFecha).toISOString().split('T')[0] : '',
+          imagenes: data.imagenes && Array.isArray(data.imagenes) ? data.imagenes : []
         };
         setFormData(subastaFormateada);
       } catch (err) {
@@ -85,43 +90,63 @@ export default function EditarSubasta() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setSaving(true);
-  setError('');
-
-  try {
-    console.log('Enviando datos:', formData);
-    
-    const res = await fetch(`https://scotto-inmobiliaria-backend.onrender.com/martillero/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    });
-
-    console.log('Response status:', res.status);
-    
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error('Error response:', errorText);
-      throw new Error(`Error ${res.status}: ${errorText}`);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files);
+      setSelectedFiles(filesArray);
     }
+  };
 
-    const result = await res.json();
-    console.log('Success response:', result);
-    
-    alert('Vehículo actualizado correctamente');
-    router.push('/admin/martillero');
-    router.refresh();
-  } catch (err) {
-    console.error('Error completo:', err);
-    setError(err instanceof Error ? err.message : 'Error al actualizar el vehículo');
-  } finally {
-    setSaving(false);
-  }
-};
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setError('');
+
+    try {
+      const formDataToSend = new FormData();
+      
+      formDataToSend.append('titulo', formData.titulo);
+      formDataToSend.append('descripcion', formData.descripcion);
+      formDataToSend.append('precioInicial', formData.precioInicial.toString());
+      formDataToSend.append('precioActual', formData.precioActual.toString());
+      formDataToSend.append('inicioFecha', new Date(formData.fechaInicio).toISOString());
+      formDataToSend.append('finFecha', new Date(formData.fechaFin).toISOString());
+      formDataToSend.append('estado', formData.estado);
+      formDataToSend.append('categoria', formData.categoria);
+      formDataToSend.append('ofertas', formData.ofertas.toString());
+      
+      selectedFiles.forEach(file => {
+        formDataToSend.append('imagenes', file);
+      });
+
+      console.log('Enviando datos con', selectedFiles.length, 'nuevas imágenes');
+      
+      const res = await fetch(`https://scotto-inmobiliaria-backend.onrender.com/subastas/${id}`, {
+        method: 'PUT',
+        body: formDataToSend,
+      });
+
+      console.log('Response status:', res.status);
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Error ${res.status}: ${errorText}`);
+      }
+
+      const result = await res.json();
+      console.log('Success response:', result);
+      
+      alert('Subasta actualizada correctamente');
+      router.push('/admin/subastas');
+      router.refresh();
+    } catch (err) {
+      console.error('Error completo:', err);
+      setError(err instanceof Error ? err.message : 'Error al actualizar la subasta');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -142,14 +167,29 @@ export default function EditarSubasta() {
         </div>
       )}
 
+      {formData.imagenes && formData.imagenes.length > 0 && (
+        <div className="mb-6 p-4 bg-gray-50 rounded">
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Imágenes Actuales ({formData.imagenes.length})
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {formData.imagenes.map((imagen, index) => (
+              <img 
+                key={index}
+                src={imagen} 
+                alt={`Imagen ${index + 1}`} 
+                className="w-24 h-16 object-cover rounded border"
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Columna izquierda */}
           <div className="space-y-4">
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Título *
-              </label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Título *</label>
               <input
                 type="text"
                 name="titulo"
@@ -161,9 +201,7 @@ export default function EditarSubasta() {
             </div>
 
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Descripción *
-              </label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Descripción *</label>
               <textarea
                 name="descripcion"
                 value={formData.descripcion}
@@ -176,9 +214,7 @@ export default function EditarSubasta() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                  Precio Inicial *
-                </label>
+                <label className="block text-gray-700 text-sm font-bold mb-2">Precio Inicial *</label>
                 <input
                   type="number"
                   name="precioInicial"
@@ -191,9 +227,7 @@ export default function EditarSubasta() {
               </div>
 
               <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                  Precio Actual *
-                </label>
+                <label className="block text-gray-700 text-sm font-bold mb-2">Precio Actual *</label>
                 <input
                   type="number"
                   name="precioActual"
@@ -207,9 +241,7 @@ export default function EditarSubasta() {
             </div>
 
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Estado *
-              </label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Estado *</label>
               <select
                 name="estado"
                 value={formData.estado}
@@ -223,12 +255,9 @@ export default function EditarSubasta() {
             </div>
           </div>
 
-          {/* Columna derecha */}
           <div className="space-y-4">
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Categoría *
-              </label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Categoría *</label>
               <select
                 name="categoria"
                 value={formData.categoria}
@@ -243,9 +272,7 @@ export default function EditarSubasta() {
             </div>
 
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Fecha de Inicio *
-              </label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Fecha de Inicio *</label>
               <input
                 type="date"
                 name="fechaInicio"
@@ -257,9 +284,7 @@ export default function EditarSubasta() {
             </div>
 
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Fecha de Fin *
-              </label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Fecha de Fin *</label>
               <input
                 type="date"
                 name="fechaFin"
@@ -271,9 +296,7 @@ export default function EditarSubasta() {
             </div>
 
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Ofertas
-              </label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Ofertas</label>
               <input
                 type="number"
                 name="ofertas"
@@ -285,18 +308,20 @@ export default function EditarSubasta() {
             </div>
 
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                URL de Imagen *
-              </label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Agregar Nuevas Imágenes</label>
               <input
-                type="url"
-                name="imagen"
-                value={formData.imagen}
-                onChange={handleChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                required
-                placeholder="https://ejemplo.com/imagen.jpg"
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleFileChange}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
               />
+              <p className="text-sm text-gray-500 mt-1">
+                {selectedFiles.length > 0 
+                  ? `${selectedFiles.length} nueva(s) imagen(es) seleccionada(s)` 
+                  : 'Opcional: selecciona imágenes para agregar a las existentes'
+                }
+              </p>
             </div>
           </div>
         </div>

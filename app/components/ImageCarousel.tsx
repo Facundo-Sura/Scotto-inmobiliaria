@@ -27,6 +27,14 @@ export default function ImageCarousel({ imagenes, titulo }: ImageCarouselProps) 
     setCurrentImageIndex(index);
   };
 
+  if (imagenes.length === 0) {
+    return (
+      <div className="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center">
+        <p className="text-gray-500">No hay imágenes disponibles</p>
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full h-96 mb-6">
       <div className="relative w-full h-full">
@@ -35,39 +43,42 @@ export default function ImageCarousel({ imagenes, titulo }: ImageCarouselProps) 
           alt={`${titulo || ''} - Imagen ${currentImageIndex + 1}`}
           fill
           className="object-cover rounded-lg"
+          priority={currentImageIndex === 0}
         />
        </div>
        
-       {/* Botones de navegación */}
-      <button
-        onClick={prevImage}
-        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
-        aria-label="Imagen anterior"
-      >
-        &#10094;
-      </button>
-      
-      <button
-        onClick={nextImage}
-        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
-        aria-label="Siguiente imagen"
-      >
-        &#10095;
-      </button>
-      
-      {/* Indicadores de imagen */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-        {imagenes.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => goToImage(index)}
-            className={`w-3 h-3 rounded-full ${
-              index === currentImageIndex ? 'bg-white' : 'bg-gray-400'
-            }`}
-            aria-label={`Ir a imagen ${index + 1}`}
-          />
-        ))}
-      </div>
+       {imagenes.length > 1 && (
+         <>
+           <button
+             onClick={prevImage}
+             className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition"
+             aria-label="Imagen anterior"
+           >
+             &#10094;
+           </button>
+           
+           <button
+             onClick={nextImage}
+             className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition"
+             aria-label="Siguiente imagen"
+           >
+             &#10095;
+           </button>
+           
+           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+             {imagenes.map((_, index) => (
+               <button
+                 key={index}
+                 onClick={() => goToImage(index)}
+                 className={`w-3 h-3 rounded-full transition ${
+                   index === currentImageIndex ? 'bg-white' : 'bg-gray-400'
+                 }`}
+                 aria-label={`Ir a imagen ${index + 1}`}
+               />
+             ))}
+           </div>
+         </>
+       )}
     </div>
   );
 }

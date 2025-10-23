@@ -27,7 +27,7 @@ export default function SubastasPage() {
     const fetchSubastas = async () => {
       try {
         setLoading(true);
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://scotto-inmobiliaria-backend.onrender.com';
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
         const response = await fetch(`${apiUrl}/subastas`);
         
         if (!response.ok) {

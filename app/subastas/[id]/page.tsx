@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
+import ImageCarousel from '../../components/ImageCarousel';
 import Link from 'next/link';
 
 // Tipo para las subastas detalladas
@@ -200,20 +201,29 @@ export default function SubastaDetallePage() {
           {/* Columna izquierda - Imagen y detalles */}
           <div className="lg:col-span-2">
             {/* Imagen principal */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
-              <div className="relative h-96">
-                <Image
-                  src={subasta.imagen}
-                  alt={subasta.titulo}
-                  fill
-                  className="object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = '/logo.png';
-                  }}
-                />
+            {/* ✅ REEMPLAZAR Imagen principal por ImageCarousel */}
+            {subasta.imagenes && subasta.imagenes.length > 1 ? (
+              <ImageCarousel 
+                imagenes={subasta.imagenes} 
+                titulo={subasta.titulo}
+              />
+            ) : (
+              // Si solo hay una imagen, mostrar normalmente
+              <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+                <div className="relative h-96">
+                  <Image
+                    src={subasta.imagen}
+                    alt={subasta.titulo}
+                    fill
+                    className="object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/logo.png';
+                    }}
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Descripción */}
             <div className="bg-white rounded-lg shadow-md p-6 mb-6">
