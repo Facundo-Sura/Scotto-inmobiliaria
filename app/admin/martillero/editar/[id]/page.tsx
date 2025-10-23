@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import Image from 'next/image';
 
 type Vehiculo = {
   id: string;
@@ -77,7 +78,6 @@ export default function EditarVehiculo() {
         if (!res.ok) throw new Error('Error al cargar el vehículo');
         const raw = await res.json();
         
-        // Procesar archivos existentes
         const archivosExistentes: ArchivoSubido[] = [];
         const imagenes = raw.imagenes || [];
         const tiposArchivos = raw.tipos_archivos || [];
@@ -96,7 +96,6 @@ export default function EditarVehiculo() {
             });
           });
         } else if (raw.imagen) {
-          // Compatibilidad con versión anterior (solo una imagen)
           archivosExistentes.push({
             url: raw.imagen,
             nombre: 'imagen_principal',
@@ -130,8 +129,8 @@ export default function EditarVehiculo() {
           imagenes: raw.imagenes || [],
           tipos_archivos: raw.tipos_archivos || []
         });
-      } catch (error) {
-        console.error(error);
+      } catch (err) {
+        console.error('Error cargando vehículo:', err);
         setError('No se pudo cargar el vehículo');
       } finally {
         setLoading(false);
@@ -169,7 +168,6 @@ export default function EditarVehiculo() {
     }));
   };
 
-  // Manejar subida de nuevos archivos
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
@@ -183,7 +181,6 @@ export default function EditarVehiculo() {
         const file = files[i];
         const esVideo = file.type.startsWith('video/');
         
-        // Crear URL local para previsualización
         const url = URL.createObjectURL(file);
         
         nuevosArchivos.push({
@@ -196,7 +193,8 @@ export default function EditarVehiculo() {
       }
       
       setArchivos(prev => [...prev, ...nuevosArchivos]);
-    } catch (error) {
+    } catch (err) {
+      console.error('Error procesando archivos:', err);
       setError('Error al procesar archivos');
     } finally {
       setSubiendoArchivos(false);
@@ -206,7 +204,6 @@ export default function EditarVehiculo() {
   const eliminarArchivo = (index: number) => {
     setArchivos(prev => {
       const nuevoArray = [...prev];
-      // Solo liberar memoria si es un archivo nuevo (con URL local)
       if (nuevoArray[index].esNuevo) {
         URL.revokeObjectURL(nuevoArray[index].url);
       }
@@ -229,7 +226,6 @@ export default function EditarVehiculo() {
     try {
       const formDataToSend = new FormData();
       
-      // Agregar campos del formulario
       formDataToSend.append('titulo', formData.titulo);
       formDataToSend.append('descripcion', formData.descripcion);
       formDataToSend.append('precio', formData.precio.toString());
@@ -246,12 +242,10 @@ export default function EditarVehiculo() {
       formDataToSend.append('motor', formData.motor);
       formDataToSend.append('cilindrada', formData.cilindrada);
       
-      // Características como array
       formData.caracteristicas.forEach(caracteristica => {
         formDataToSend.append('caracteristicas', caracteristica);
       });
 
-      // Agregar solo archivos nuevos
       const archivosNuevos = archivos.filter(archivo => archivo.esNuevo && archivo.file);
       archivosNuevos.forEach(archivo => {
         if (archivo.file) {
@@ -273,7 +267,6 @@ export default function EditarVehiculo() {
         return;
       }
 
-      // Limpiar URLs de previsualización de archivos nuevos
       archivos.forEach(archivo => {
         if (archivo.esNuevo) {
           URL.revokeObjectURL(archivo.url);
@@ -283,6 +276,7 @@ export default function EditarVehiculo() {
       router.push('/admin/martillero');
       router.refresh();
     } catch (err) {
+      console.error('Error actualizando vehículo:', err);
       setError(err instanceof Error ? err.message : 'Error al actualizar el vehículo');
     } finally {
       setSaving(false);
@@ -307,8 +301,6 @@ export default function EditarVehiculo() {
         </div>
       )}
       <form onSubmit={handleSubmit} className="space-y-6">
-        
-        {/* SECCIÓN ARCHIVOS MULTIMEDIA */}
         <div className="border rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">Archivos Multimedia</h2>
           
@@ -332,16 +324,18 @@ export default function EditarVehiculo() {
             </p>
           </div>
 
-          {/* Previsualización de archivos */}
           {archivos.length > 0 && (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
               {archivos.map((archivo, index) => (
                 <div key={index} className="relative border rounded-lg overflow-hidden group">
                   {archivo.tipo === 'imagen' ? (
-                    <img
+                    <Image
                       src={archivo.url}
                       alt={`Vista previa ${index + 1}`}
+                      width={100}
+                      height={96}
                       className="w-full h-24 object-cover"
+                      unoptimized
                     />
                   ) : (
                     <video
@@ -371,7 +365,6 @@ export default function EditarVehiculo() {
           )}
         </div>
 
-        {/* CAMPOS DEL FORMULARIO */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium mb-2">Título *</label>
@@ -462,7 +455,6 @@ export default function EditarVehiculo() {
           </div>
         </div>
 
-        {/* Características */}
         <div className="mt-6">
           <label className="block text-sm font-medium mb-2">Características</label>
           <div className="flex gap-2 mb-2">

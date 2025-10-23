@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface VehiculoFormData {
   titulo: string;
@@ -67,7 +68,6 @@ export default function NuevoVehiculoPage() {
     }));
   };
 
-  // Manejar subida de archivos
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
@@ -81,7 +81,6 @@ export default function NuevoVehiculoPage() {
         const file = files[i];
         const esVideo = file.type.startsWith('video/');
         
-        // Crear URL local para previsualización
         const url = URL.createObjectURL(file);
         
         nuevosArchivos.push({
@@ -93,7 +92,8 @@ export default function NuevoVehiculoPage() {
       }
       
       setArchivos(prev => [...prev, ...nuevosArchivos]);
-    } catch (error) {
+    } catch (err) {
+      console.error('Error procesando archivos:', err);
       setError('Error al procesar archivos');
     } finally {
       setSubiendoArchivos(false);
@@ -103,7 +103,7 @@ export default function NuevoVehiculoPage() {
   const eliminarArchivo = (index: number) => {
     setArchivos(prev => {
       const nuevoArray = [...prev];
-      URL.revokeObjectURL(nuevoArray[index].url); // Liberar memoria
+      URL.revokeObjectURL(nuevoArray[index].url);
       nuevoArray.splice(index, 1);
       return nuevoArray;
     });
@@ -123,7 +123,6 @@ export default function NuevoVehiculoPage() {
     try {
       const formDataToSend = new FormData();
       
-      // Agregar campos del formulario
       formDataToSend.append('titulo', formData.titulo);
       formDataToSend.append('descripcion', formData.descripcion);
       formDataToSend.append('precio', formData.precio.toString());
@@ -140,7 +139,6 @@ export default function NuevoVehiculoPage() {
       formDataToSend.append('motor', formData.motor);
       formDataToSend.append('cilindrada', formData.cilindrada);
       
-      // Características como array
       const caracteristicasArr = formData.caracteristicas
         .split(',')
         .map(c => c.trim())
@@ -150,20 +148,21 @@ export default function NuevoVehiculoPage() {
         formDataToSend.append('caracteristicas', caracteristica);
       });
 
-      // Agregar archivos
-      archivos.forEach(archivo => {
+      const archivosConFile = archivos.filter(archivo => archivo.file);
+      
+      archivosConFile.forEach(archivo => {
         if (archivo.file) {
           formDataToSend.append('archivos', archivo.file);
         }
       });
 
-      console.log('Enviando formulario con archivos:', archivos.length);
+      console.log('Enviando formulario con archivos:', archivosConFile.length);
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL || 'https://scotto-inmobiliaria-backend.onrender.com'}/martillero`,
         {
           method: 'POST',
-          body: formDataToSend, // ✅ Sin Content-Type header (se setea automáticamente con FormData)
+          body: formDataToSend,
         }
       );
 
@@ -174,12 +173,12 @@ export default function NuevoVehiculoPage() {
         throw new Error(resp?.error || resp?.message || 'Error al crear el vehículo');
       }
 
-      // Limpiar URLs de previsualización
       archivos.forEach(archivo => URL.revokeObjectURL(archivo.url));
       
       router.push('/admin/martillero');
       router.refresh();
     } catch (err) {
+      console.error('Error creando vehículo:', err);
       setError(err instanceof Error ? err.message : 'Error desconocido');
     } finally {
       setLoading(false);
@@ -197,7 +196,6 @@ export default function NuevoVehiculoPage() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* SECCIÓN ARCHIVOS */}
         <div className="border rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">Archivos Multimedia</h2>
           
@@ -218,16 +216,18 @@ export default function NuevoVehiculoPage() {
             </p>
           </div>
 
-          {/* Previsualización de archivos */}
           {archivos.length > 0 && (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
               {archivos.map((archivo, index) => (
                 <div key={index} className="relative border rounded-lg overflow-hidden">
                   {archivo.tipo === 'imagen' ? (
-                    <img
+                    <Image
                       src={archivo.url}
                       alt={`Vista previa ${index + 1}`}
+                      width={100}
+                      height={96}
                       className="w-full h-24 object-cover"
+                      unoptimized
                     />
                   ) : (
                     <video
@@ -252,7 +252,6 @@ export default function NuevoVehiculoPage() {
           )}
         </div>
 
-        {/* CAMPOS DEL FORMULARIO (MANTENIENDO TU ESTRUCTURA ACTUAL) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium mb-2">Título *</label>
@@ -279,7 +278,7 @@ export default function NuevoVehiculoPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Categoría *</label>
+            <label className="block text-sm font-medium mb-2">Categoría (vehículo) *</label>
             <select
               name="categoria"
               value={formData.categoria}
@@ -296,7 +295,7 @@ export default function NuevoVehiculoPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Tipo *</label>
+            <label className="block text-sm font-medium mb-2">Tipo (operación) *</label>
             <select
               name="tipo"
               value={formData.tipo}
@@ -310,7 +309,6 @@ export default function NuevoVehiculoPage() {
             </select>
           </div>
 
-          {/* ... MANTENER EL RESTO DE TUS CAMPOS ACTUALES ... */}
           <div>
             <label className="block text-sm font-medium mb-2">Marca *</label>
             <input
@@ -356,6 +354,7 @@ export default function NuevoVehiculoPage() {
               name="kilometraje"
               value={formData.kilometraje}
               onChange={handleInputChange}
+              required
               className="w-full p-2 border border-gray-300 rounded"
             />
           </div>

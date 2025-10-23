@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
-// Tipo para las propiedades según la base de datos
 type Propiedad = {
   id: string;
   titulo: string;
@@ -19,12 +18,28 @@ type Propiedad = {
   updated_at: string;
 };
 
+interface PropiedadFromAPI {
+  id?: string;
+  titulo?: string;
+  descripcion?: string;
+  precio?: number | string;
+  tipo?: string;
+  operacion?: string;
+  direccion?: string;
+  habitaciones?: number | string | null;
+  metros?: number | string | null;
+  imagen?: string | null;
+  imagenes?: string[];
+  tipos_archivos?: string[];
+  created_at?: string;
+  updated_at?: string;
+}
+
 export default function PropiedadesAdmin() {
   const [propiedades, setPropiedades] = useState<Propiedad[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Función para cargar propiedades desde la API
   const fetchPropiedades = async () => {
     try {
       setLoading(true);
@@ -36,12 +51,19 @@ export default function PropiedadesAdmin() {
       
       const data = await res.json();
       
-      // ✅ CORRECCIÓN: Validar y transformar los datos para asegurar que precio sea número
-      const propiedadesValidas = data.map((propiedad: any) => ({
-        ...propiedad,
-        precio: Number(propiedad.precio) || 0, // Asegurar que precio sea número
+      const propiedadesValidas = data.map((propiedad: PropiedadFromAPI) => ({
+        id: propiedad.id || '',
+        titulo: propiedad.titulo || '',
+        descripcion: propiedad.descripcion || '',
+        precio: Number(propiedad.precio) || 0,
+        tipo: (propiedad.tipo as 'casa' | 'departamento' | 'terreno' | 'local') || 'casa',
+        operacion: (propiedad.operacion as 'venta' | 'alquiler') || 'venta',
+        direccion: propiedad.direccion || '',
         habitaciones: propiedad.habitaciones ? Number(propiedad.habitaciones) : null,
-        metros: propiedad.metros ? Number(propiedad.metros) : null
+        metros: propiedad.metros ? Number(propiedad.metros) : null,
+        imagen: propiedad.imagen || propiedad.imagenes?.[0] || null,
+        created_at: propiedad.created_at || '',
+        updated_at: propiedad.updated_at || ''
       }));
       
       setPropiedades(propiedadesValidas);
@@ -55,7 +77,6 @@ export default function PropiedadesAdmin() {
     }
   };
 
-  // Función para eliminar propiedad
   const eliminarPropiedad = async (id: string) => {
     if (!confirm('¿Estás seguro de que quieres eliminar esta propiedad?')) {
       return;
@@ -70,7 +91,6 @@ export default function PropiedadesAdmin() {
         throw new Error(`Error: ${res.status}`);
       }
 
-      // Actualizar la lista después de eliminar
       setPropiedades(propiedades.filter(propiedad => propiedad.id !== id));
       alert('Propiedad eliminada correctamente');
     } catch (err) {
@@ -155,7 +175,6 @@ export default function PropiedadesAdmin() {
                   {propiedad.direccion}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {/* ✅ CORRECCIÓN: Validar que precio existe antes de usar toLocaleString */}
                   ${propiedad.precio?.toLocaleString() ?? '0'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
