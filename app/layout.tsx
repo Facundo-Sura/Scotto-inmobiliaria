@@ -13,11 +13,11 @@ const audiowide = Audiowide({
 });
 
 export const metadata: Metadata = {
-  title: "Inmobiliaria y Martillero Eduardo Raul Scotto | Alta Gracia, Córdoba",
+  title: "Inmobiliaria Scotto | Alta Gracia, Córdoba",
   description:
     "Servicios inmobiliarios y de martillero en Alta Gracia, Córdoba. Propiedades y vehículos a la venta.",
   keywords:
-    "inmobiliaria, martillero, Alta Gracia, Córdoba, Argentina, propiedades, vehículos, autos, Eduardo Raul Scotto",
+    "inmobiliaria scotto, martillero, Alta Gracia, Córdoba, Argentina, propiedades, vehículos, autos, Eduardo Raul Scotto",
 };
 
 export default function RootLayout({
