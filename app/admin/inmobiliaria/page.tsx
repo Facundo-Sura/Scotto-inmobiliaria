@@ -35,7 +35,16 @@ export default function PropiedadesAdmin() {
       }
       
       const data = await res.json();
-      setPropiedades(data);
+      
+      // ✅ CORRECCIÓN: Validar y transformar los datos para asegurar que precio sea número
+      const propiedadesValidas = data.map((propiedad: any) => ({
+        ...propiedad,
+        precio: Number(propiedad.precio) || 0, // Asegurar que precio sea número
+        habitaciones: propiedad.habitaciones ? Number(propiedad.habitaciones) : null,
+        metros: propiedad.metros ? Number(propiedad.metros) : null
+      }));
+      
+      setPropiedades(propiedadesValidas);
       setError(null);
     } catch (err) {
       console.error('Error al cargar propiedades:', err);
@@ -146,7 +155,8 @@ export default function PropiedadesAdmin() {
                   {propiedad.direccion}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ${propiedad.precio.toLocaleString()}
+                  {/* ✅ CORRECCIÓN: Validar que precio existe antes de usar toLocaleString */}
+                  ${propiedad.precio?.toLocaleString() ?? '0'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <Link 

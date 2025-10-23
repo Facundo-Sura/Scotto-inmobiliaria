@@ -7,14 +7,13 @@ interface VehiculoFormData {
   titulo: string;
   descripcion: string;
   precio: number;
-  categoria: string; // renombrado desde 'tipo' a 'categoria' (tipo = operación)
-  tipo: string; // nuevo: 'venta' | 'subasta' | 'alquiler'
+  categoria: string;
+  tipo: string;
   marca: string;
   modelo: string;
   anio: number;
   kilometraje: number;
   caracteristicas: string;
-  imagen: string;
   combustible: string;
   transmision: string;
   color: string;
@@ -23,22 +22,31 @@ interface VehiculoFormData {
   cilindrada: string;
 }
 
+interface ArchivoSubido {
+  url: string;
+  nombre: string;
+  tipo: 'imagen' | 'video';
+  file?: File;
+}
+
 export default function NuevoVehiculoPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [archivos, setArchivos] = useState<ArchivoSubido[]>([]);
+  const [subiendoArchivos, setSubiendoArchivos] = useState(false);
+
   const [formData, setFormData] = useState<VehiculoFormData>({
     titulo: '',
     descripcion: '',
     precio: 0,
-    categoria: '', // antes 'tipo'
-    tipo: 'venta', // por defecto envío 'venta' (cumple validación backend)
+    categoria: '',
+    tipo: 'venta',
     marca: '',
     modelo: '',
     anio: new Date().getFullYear(),
     kilometraje: 0,
     caracteristicas: '',
-    imagen: '',
     combustible: '',
     transmision: '',
     color: '',
@@ -59,6 +67,48 @@ export default function NuevoVehiculoPage() {
     }));
   };
 
+  // Manejar subida de archivos
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    setSubiendoArchivos(true);
+    
+    try {
+      const nuevosArchivos: ArchivoSubido[] = [];
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const esVideo = file.type.startsWith('video/');
+        
+        // Crear URL local para previsualización
+        const url = URL.createObjectURL(file);
+        
+        nuevosArchivos.push({
+          url,
+          nombre: file.name,
+          tipo: esVideo ? 'video' : 'imagen',
+          file
+        });
+      }
+      
+      setArchivos(prev => [...prev, ...nuevosArchivos]);
+    } catch (error) {
+      setError('Error al procesar archivos');
+    } finally {
+      setSubiendoArchivos(false);
+    }
+  };
+
+  const eliminarArchivo = (index: number) => {
+    setArchivos(prev => {
+      const nuevoArray = [...prev];
+      URL.revokeObjectURL(nuevoArray[index].url); // Liberar memoria
+      nuevoArray.splice(index, 1);
+      return nuevoArray;
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -71,56 +121,64 @@ export default function NuevoVehiculoPage() {
     }
 
     try {
-      const caracteristicasArr = (typeof formData.caracteristicas === 'string')
-        ? formData.caracteristicas.split(',').map(c => c.trim()).filter(Boolean)
-        : (Array.isArray(formData.caracteristicas) ? formData.caracteristicas : []);
-
-      const payload = {
-        titulo: String(formData.titulo),
-        descripcion: String(formData.descripcion || ''),
-        precio: Number(formData.precio || 0),
-        categoria: String(formData.categoria || ''),
-        tipo: String(formData.tipo || 'venta'),
-        marca: String(formData.marca || ''),
-        modelo: String(formData.modelo || ''),
-        anio: Number(formData.anio || new Date().getFullYear()),
-        // compatibilidad con backend que use 'año'
-        año: Number(formData.anio || new Date().getFullYear()),
-        kilometraje: Number(formData.kilometraje || 0),
-        caracteristicas: caracteristicasArr,
-        imagen: String(formData.imagen || ''),
-        // Enviar detalles tanto dentro de 'detalles' como en top-level (compatibilidad)
-        combustible: String(formData.combustible || ''),
-        transmision: String(formData.transmision || ''),
-        color: String(formData.color || ''),
-        puertas: Number(formData.puertas || 0),
-        motor: String(formData.motor || ''),
-        cilindrada: String(formData.cilindrada || ''),
-        detalles: {
-          combustible: String(formData.combustible || ''),
-          transmision: String(formData.transmision || ''),
-          color: String(formData.color || ''),
-          puertas: Number(formData.puertas || 0),
-          motor: String(formData.motor || ''),
-          cilindrada: String(formData.cilindrada || ''),
-        }
-      };
-
-      console.log('POST /martillero payload:', payload);
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://scotto-inmobiliaria-backend.onrender.com'}/martillero`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+      const formDataToSend = new FormData();
+      
+      // Agregar campos del formulario
+      formDataToSend.append('titulo', formData.titulo);
+      formDataToSend.append('descripcion', formData.descripcion);
+      formDataToSend.append('precio', formData.precio.toString());
+      formDataToSend.append('categoria', formData.categoria);
+      formDataToSend.append('tipo', formData.tipo);
+      formDataToSend.append('marca', formData.marca);
+      formDataToSend.append('modelo', formData.modelo);
+      formDataToSend.append('anio', formData.anio.toString());
+      formDataToSend.append('kilometraje', formData.kilometraje.toString());
+      formDataToSend.append('combustible', formData.combustible);
+      formDataToSend.append('transmision', formData.transmision);
+      formDataToSend.append('color', formData.color);
+      formDataToSend.append('puertas', formData.puertas.toString());
+      formDataToSend.append('motor', formData.motor);
+      formDataToSend.append('cilindrada', formData.cilindrada);
+      
+      // Características como array
+      const caracteristicasArr = formData.caracteristicas
+        .split(',')
+        .map(c => c.trim())
+        .filter(Boolean);
+      
+      caracteristicasArr.forEach(caracteristica => {
+        formDataToSend.append('caracteristicas', caracteristica);
       });
 
+      // Agregar archivos
+      archivos.forEach(archivo => {
+        if (archivo.file) {
+          formDataToSend.append('archivos', archivo.file);
+        }
+      });
+
+      console.log('Enviando formulario con archivos:', archivos.length);
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://scotto-inmobiliaria-backend.onrender.com'}/martillero`,
+        {
+          method: 'POST',
+          body: formDataToSend, // ✅ Sin Content-Type header (se setea automáticamente con FormData)
+        }
+      );
+
       const resp = await response.json().catch(() => null);
+      
       if (!response.ok) {
-        console.error('Server error body:', resp);
-        throw new Error(resp?.message || resp?.error || JSON.stringify(resp) || 'Error al crear el vehículo');
+        console.error('Server error:', resp);
+        throw new Error(resp?.error || resp?.message || 'Error al crear el vehículo');
       }
 
+      // Limpiar URLs de previsualización
+      archivos.forEach(archivo => URL.revokeObjectURL(archivo.url));
+      
       router.push('/admin/martillero');
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
     } finally {
@@ -139,9 +197,65 @@ export default function NuevoVehiculoPage() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* SECCIÓN ARCHIVOS */}
+        <div className="border rounded-lg p-6">
+          <h2 className="text-xl font-semibold mb-4">Archivos Multimedia</h2>
+          
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2">
+              Subir imágenes y videos (máx. 10 archivos)
+            </label>
+            <input
+              type="file"
+              multiple
+              accept="image/*,video/*"
+              onChange={handleFileChange}
+              disabled={subiendoArchivos || archivos.length >= 10}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+            <p className="text-sm text-gray-500 mt-1">
+              Formatos: JPG, PNG, GIF, WEBP, MP4, MOV, AVI, MKV, WEBM (máx. 100MB por archivo)
+            </p>
+          </div>
+
+          {/* Previsualización de archivos */}
+          {archivos.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+              {archivos.map((archivo, index) => (
+                <div key={index} className="relative border rounded-lg overflow-hidden">
+                  {archivo.tipo === 'imagen' ? (
+                    <img
+                      src={archivo.url}
+                      alt={`Vista previa ${index + 1}`}
+                      className="w-full h-24 object-cover"
+                    />
+                  ) : (
+                    <video
+                      src={archivo.url}
+                      className="w-full h-24 object-cover"
+                      muted
+                    />
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => eliminarArchivo(index)}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm"
+                  >
+                    ×
+                  </button>
+                  <div className="p-2 text-xs truncate">
+                    {archivo.nombre}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* CAMPOS DEL FORMULARIO (MANTENIENDO TU ESTRUCTURA ACTUAL) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium mb-2">Título</label>
+            <label className="block text-sm font-medium mb-2">Título *</label>
             <input
               type="text"
               name="titulo"
@@ -153,7 +267,7 @@ export default function NuevoVehiculoPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Precio</label>
+            <label className="block text-sm font-medium mb-2">Precio *</label>
             <input
               type="number"
               name="precio"
@@ -165,7 +279,7 @@ export default function NuevoVehiculoPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Categoría (vehículo)</label>
+            <label className="block text-sm font-medium mb-2">Categoría *</label>
             <select
               name="categoria"
               value={formData.categoria}
@@ -182,7 +296,7 @@ export default function NuevoVehiculoPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Tipo (operación)</label>
+            <label className="block text-sm font-medium mb-2">Tipo *</label>
             <select
               name="tipo"
               value={formData.tipo}
@@ -196,8 +310,9 @@ export default function NuevoVehiculoPage() {
             </select>
           </div>
 
+          {/* ... MANTENER EL RESTO DE TUS CAMPOS ACTUALES ... */}
           <div>
-            <label className="block text-sm font-medium mb-2">Marca</label>
+            <label className="block text-sm font-medium mb-2">Marca *</label>
             <input
               type="text"
               name="marca"
@@ -209,7 +324,7 @@ export default function NuevoVehiculoPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Modelo</label>
+            <label className="block text-sm font-medium mb-2">Modelo *</label>
             <input
               type="text"
               name="modelo"
@@ -221,7 +336,7 @@ export default function NuevoVehiculoPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Año</label>
+            <label className="block text-sm font-medium mb-2">Año *</label>
             <input
               type="number"
               name="anio"
@@ -241,19 +356,6 @@ export default function NuevoVehiculoPage() {
               name="kilometraje"
               value={formData.kilometraje}
               onChange={handleInputChange}
-              required
-              className="w-full p-2 border border-gray-300 rounded"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">Imagen URL</label>
-            <input
-              type="url"
-              name="imagen"
-              value={formData.imagen}
-              onChange={handleInputChange}
-              required
               className="w-full p-2 border border-gray-300 rounded"
             />
           </div>
@@ -367,7 +469,7 @@ export default function NuevoVehiculoPage() {
         <div className="flex gap-4">
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || subiendoArchivos}
             className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
           >
             {loading ? 'Creando...' : 'Crear Vehículo'}
