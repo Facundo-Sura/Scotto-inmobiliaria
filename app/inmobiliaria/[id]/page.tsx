@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import ImageCarousel from "../../components/ImageCarousel";
 
 // Tipo para las propiedades
 interface Propiedad {
@@ -17,6 +18,7 @@ interface Propiedad {
   habitaciones: number | null;
   metros: number | null;
   imagen: string | null;
+  imagenes?: string[];
   created_at: string;
   updated_at: string;
 }
@@ -87,6 +89,15 @@ export default function PropiedadDetallePage() {
     }).format(price);
   };
 
+  // Preparar array de imágenes
+  const imagenes = propiedad.imagenes && propiedad.imagenes.length > 0 
+    ? propiedad.imagenes 
+    : propiedad.imagen 
+      ? [propiedad.imagen] 
+      : [];
+
+  const tituloEncode = encodeURIComponent(propiedad.titulo);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -99,79 +110,105 @@ export default function PropiedadDetallePage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Imagen principal */}
-        <div className="mb-8">
-          {propiedad.imagen ? (
-            <div className="relative h-96 w-full rounded-lg overflow-hidden">
-              <Image
-                src={propiedad.imagen}
-                alt={propiedad.titulo}
-                fill
-                className="object-cover"
-              />
-            </div>
-          ) : (
-            <div className="h-96 w-full bg-gray-200 rounded-lg flex items-center justify-center">
-              <span className="text-gray-500">Sin imagen</span>
-            </div>
-          )}
-        </div>
+        {/* Imagen principal con ImageCarousel */}
+        {imagenes.length > 0 ? (
+          <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+            <ImageCarousel 
+              imagenes={imagenes}
+              titulo={propiedad.titulo}
+
+            />
+          </div>
+        ) : (
+          <div className="h-96 w-full bg-gray-200 rounded-lg flex items-center justify-center mb-8">
+            <span className="text-gray-500">Sin imagen</span>
+          </div>
+        )}
 
         {/* Información principal */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Columna izquierda - Información principal */}
           <div className="lg:col-span-2">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              {propiedad.titulo}
-            </h1>
-
             <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-2xl font-bold text-red-600">
-                  {formatPrice(propiedad.precio)}
-                </span>
-                <span className="bg-red-100 text-red-800 text-sm font-medium px-3 py-1 rounded">
-                  {propiedad.operacion.toUpperCase()}
-                </span>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2 sm:mb-0">
+                  {propiedad.titulo}
+                </h1>
+                <div className="flex flex-col sm:items-end">
+                  <span className="text-2xl font-bold text-red-600">
+                    {formatPrice(propiedad.precio)}
+                  </span>
+                  <span className="text-sm text-gray-600 capitalize">
+                    {propiedad.operacion} - {propiedad.tipo}
+                  </span>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                {propiedad.habitaciones && (
+              <p className="text-gray-600 mb-6">{propiedad.direccion}</p>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                {propiedad.habitaciones !== null && (
                   <div className="text-center">
                     <div className="text-2xl font-bold text-gray-900">
                       {propiedad.habitaciones}
                     </div>
-                    <div className="text-sm text-gray-600">Habitaciones</div>
+                    <div className="text-sm text-gray-600">
+                      {propiedad.habitaciones === 1 ? "Habitación" : "Habitaciones"}
+                    </div>
                   </div>
                 )}
-                {propiedad.metros && (
+                {propiedad.metros !== null && (
                   <div className="text-center">
                     <div className="text-2xl font-bold text-gray-900">
-                      {propiedad.metros}m²
+                      {propiedad.metros}
                     </div>
-                    <div className="text-sm text-gray-600">Superficie</div>
+                    <div className="text-sm text-gray-600">m²</div>
                   </div>
                 )}
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">
+                  <div className="text-2xl font-bold text-gray-900 capitalize">
                     {propiedad.tipo}
                   </div>
                   <div className="text-sm text-gray-600">Tipo</div>
                 </div>
-              </div>
-
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-3">Ubicación</h3>
-                <p className="text-gray-700">{propiedad.direccion}</p>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900 capitalize">
+                    {propiedad.operacion}
+                  </div>
+                  <div className="text-sm text-gray-600">Operación</div>
+                </div>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold mb-3">Descripción</h3>
+                <h3 className="text-xl font-semibold mb-3">Descripción</h3>
                 <p className="text-gray-700 leading-relaxed">
                   {propiedad.descripcion}
                 </p>
               </div>
             </div>
+
+            {/* Galería de imágenes adicionales */}
+            {imagenes.length > 1 && (
+              <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h3 className="text-xl font-semibold mb-4">Galería de Imágenes</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {imagenes.map((img, index) => (
+                    <div
+                      key={index}
+                      className="relative h-32 w-full rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition"
+                      onClick={() => window.open(img, "_blank")}
+                    >
+                      <Image
+                        src={img}
+                        alt={`${propiedad.titulo} - Imagen ${index + 1}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Columna derecha - Contacto */}
@@ -183,7 +220,7 @@ export default function PropiedadDetallePage() {
 
               <div className="space-y-4">
                 <Link
-                  href="https://mail.google.com/mail/?view=cm&fs=1&to=inmobiliariascotto@hotmail.com&su=Consulta%20sobre%20propiedad&body=Hola,%20me%20interesa%20la%20propiedad:%20PROPIEDAD_TITULO"
+                  href={`https://mail.google.com/mail/?view=cm&fs=1&to=inmobiliariascotto@hotmail.com&su=Consulta%20sobre%20propiedad&body=${tituloEncode}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block w-full bg-red-600 hover:bg-red-700 text-white text-center font-bold py-3 px-4 rounded-lg transition duration-300"
@@ -192,7 +229,7 @@ export default function PropiedadDetallePage() {
                 </Link>
 
                 <Link
-                  href="https://wa.me/5493510000000?text=Hola,%20me%20interesa%20la%20propiedad:%20PROPIEDAD_TITULO"
+                  href={`https://wa.me/5493510000000?text=Hola,%20me%20interesa%20la%20propiedad:%20${tituloEncode}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block w-full bg-green-600 hover:bg-green-700 text-white text-center font-bold py-3 px-4 rounded-lg transition duration-300"
@@ -202,9 +239,28 @@ export default function PropiedadDetallePage() {
               </div>
 
               <div className="mt-6 pt-6 border-t border-gray-200">
-                <h4 className="font-semibold mb-2">Publicado el:</h4>
+                <h4 className="font-semibold mb-2">Información del contacto:</h4>
+                <p className="text-gray-600 mb-1">Inmobiliaria Scotto</p>
+                <p className="text-gray-600 mb-1">
+                  Email:{" "}
+                  <a
+                    href="mailto:inmobiliariascotto@hotmail.com"
+                    className="text-red-600 hover:underline"
+                  >
+                    inmobiliariascotto@hotmail.com
+                  </a>
+                </p>
+                <p className="text-gray-600 mb-1">
+                  Teléfono:{" "}
+                  <a
+                    href="tel:+5493510000000"
+                    className="text-red-600 hover:underline"
+                  >
+                    +54 9 351 000-0000
+                  </a>
+                </p>
                 <p className="text-gray-600">
-                  {new Date(propiedad.created_at).toLocaleDateString("es-AR")}
+                  Dirección: Av. Siempre Viva 123, Córdoba
                 </p>
               </div>
             </div>

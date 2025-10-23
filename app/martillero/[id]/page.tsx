@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import ImageCarousel from '../../components/ImageCarousel';
 
 interface Vehiculo {
   id: string;
@@ -62,7 +63,7 @@ export default function VehiculoDetallePage() {
           caracteristicas: Array.isArray(raw.caracteristicas)
             ? raw.caracteristicas
             : (typeof raw.caracteristicas === 'string' ? raw.caracteristicas.split(',').map((s: string) => s.trim()).filter(Boolean) : []),
-          imagen: raw.imagen ?? (Array.isArray(raw.imagenes) && raw.imagenes[0]) ?? '/placeholder.png',
+          imagen: raw.imagen ?? (Array.isArray(raw.imagenes) && raw.imagenes[0]) ?? '/logo.png',
           imagenes: Array.isArray(raw.imagenes) ? raw.imagenes : (raw.imagen ? [raw.imagen] : []),
           detalles: {
             combustible: raw.detalles?.combustible ?? raw.combustible ?? '',
@@ -129,10 +130,12 @@ export default function VehiculoDetallePage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <div className="relative h-96 w-full rounded-lg overflow-hidden">
-            <Image src={vehiculo.imagen} alt={vehiculo.titulo} fill className="object-cover" />
-          </div>
+        {/* Imagen principal con ImageCarousel */}
+        <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+          <ImageCarousel 
+            imagenes={vehiculo.imagenes && vehiculo.imagenes.length > 0 ? vehiculo.imagenes : [vehiculo.imagen]}
+            titulo={vehiculo.titulo}
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -229,13 +232,20 @@ export default function VehiculoDetallePage() {
               </div>
             )}
 
-            {vehiculo.imagenes && vehiculo.imagenes.length > 0 && (
+            {/* Galería de imágenes adicionales */}
+            {vehiculo.imagenes && vehiculo.imagenes.length > 1 && (
               <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                <h3 className="text-lg font-semibold mb-4">Otras Imágenes</h3>
+                <h3 className="text-lg font-semibold mb-4">Galería de Imágenes</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                   {vehiculo.imagenes.map((img, index) => (
                     <div key={index} className="relative h-32 w-full rounded-lg overflow-hidden">
-                      <Image src={img} alt={`${vehiculo.titulo} - Imagen ${index + 1}`} fill className="object-cover" />
+                      <Image 
+                        src={img} 
+                        alt={`${vehiculo.titulo} - Imagen ${index + 1}`} 
+                        fill 
+                        className="object-cover cursor-pointer hover:opacity-80 transition"
+                        onClick={() => window.open(img, '_blank')}
+                      />
                     </div>
                   ))}
                 </div>

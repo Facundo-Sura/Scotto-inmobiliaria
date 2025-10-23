@@ -200,30 +200,13 @@ export default function SubastaDetallePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Columna izquierda - Imagen y detalles */}
           <div className="lg:col-span-2">
-            {/* Imagen principal */}
-            {/* ✅ REEMPLAZAR Imagen principal por ImageCarousel */}
-            {subasta.imagenes && subasta.imagenes.length > 1 ? (
+            {/* Imagen principal con ImageCarousel */}
+            <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
               <ImageCarousel 
-                imagenes={subasta.imagenes} 
+                imagenes={subasta.imagenes && subasta.imagenes.length > 0 ? subasta.imagenes : [subasta.imagen]}
                 titulo={subasta.titulo}
               />
-            ) : (
-              // Si solo hay una imagen, mostrar normalmente
-              <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
-                <div className="relative h-96">
-                  <Image
-                    src={subasta.imagen}
-                    alt={subasta.titulo}
-                    fill
-                    className="object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = '/logo.png';
-                    }}
-                  />
-                </div>
-              </div>
-            )}
+            </div>
 
             {/* Descripción */}
             <div className="bg-white rounded-lg shadow-md p-6 mb-6">
