@@ -13,11 +13,73 @@ const audiowide = Audiowide({
 });
 
 export const metadata: Metadata = {
-  title: "Inmobiliaria Scotto | Alta Gracia, Córdoba",
-  description:
-    "Servicios inmobiliarios y de martillero en Alta Gracia, Córdoba. Propiedades y vehículos a la venta.",
-  keywords:
-    "inmobiliaria scotto, martillero, Alta Gracia, Córdoba, Argentina, propiedades, vehículos, autos, Eduardo Raul Scotto",
+  title: {
+    default: "Inmobiliaria Scotto | Propiedades en Alta Gracia, Córdoba",
+    template: "%s | Inmobiliaria Scotto Alta Gracia"
+  },
+  description: "Inmobiliaria Scotto - Especialistas en propiedades en Alta Gracia. Compra, venta y alquiler de casas, departamentos y terrenos. Asesoramiento profesional en bienes raíces.",
+  keywords: [
+    "inmobiliaria scotto",
+    "inmobiliaria alta gracia", 
+    "propiedades alta gracia",
+    "casas en venta alta gracia",
+    "alquiler alta gracia",
+    "departamentos alta gracia",
+    "terrenos alta gracia",
+    "inmobiliaria córdoba",
+    "martillero alta gracia",
+    "bienes raíces alta gracia",
+    "Eduardo Raul Scotto"
+  ].join(", "),
+  authors: [{ name: "Inmobiliaria Scotto" }],
+  creator: "Inmobiliaria Scotto",
+  publisher: "Inmobiliaria Scotto",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL('https://scotto-inmobiliaria.com'), // Reemplaza con tu dominio real
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'es_AR',
+    url: 'https://scotto-inmobiliaria.com',
+    title: 'Inmobiliaria Scotto | Propiedades en Alta Gracia, Córdoba',
+    description: 'Especialistas en propiedades en Alta Gracia. Compra, venta y alquiler de casas, departamentos y terrenos.',
+    siteName: 'Inmobiliaria Scotto',
+    images: [
+      {
+        url: '/images/og-image.jpg', // Asegúrate de crear esta imagen
+        width: 1200,
+        height: 630,
+        alt: 'Inmobiliaria Scotto - Propiedades en Alta Gracia',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Inmobiliaria Scotto | Propiedades en Alta Gracia, Córdoba',
+    description: 'Especialistas en propiedades en Alta Gracia. Compra, venta y alquiler.',
+    images: ['/images/og-image.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    // Agrega aquí tu Google Search Console cuando la tengas
+    // google: 'tu-codigo-de-verificacion',
+  }
 };
 
 export default function RootLayout({
@@ -27,9 +89,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body
-        className={`${audiowide.variable} antialiased`}
-      >
+      <head>
+        <link rel="canonical" href="https://scotto-inmobiliaria.com" />
+        <meta name="geo.region" content="AR-X" />
+        <meta name="geo.placename" content="Alta Gracia, Córdoba" />
+        <meta name="geo.position" content="-31.652966;-64.428268" />
+        <meta name="ICBM" content="-31.652966, -64.428268" />
+      </head>
+      <body className={`${audiowide.variable} antialiased`}>
         <Providers>
           <Navbar />
           <main className="min-h-screen">
