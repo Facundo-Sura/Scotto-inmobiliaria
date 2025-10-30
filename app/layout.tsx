@@ -39,14 +39,14 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://scotto-inmobiliaria.com'), // Reemplaza con tu dominio real
+  metadataBase: new URL('https://inmobiliariascotto.com.ar'), // Reemplaza con tu dominio real
   alternates: {
     canonical: '/',
   },
   openGraph: {
     type: 'website',
     locale: 'es_AR',
-    url: 'https://scotto-inmobiliaria.com',
+    url: 'https://inmobiliariascotto.com.ar',
     title: 'Inmobiliaria Scotto | Propiedades en Alta Gracia, Córdoba',
     description: 'Especialistas en propiedades en Alta Gracia. Compra, venta y alquiler de casas, departamentos y terrenos.',
     siteName: 'Inmobiliaria Scotto',
@@ -90,11 +90,26 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
-        <link rel="canonical" href="https://scotto-inmobiliaria.com" />
+        <link rel="canonical" href="https://inmobiliariascotto.com.ar" />
         <meta name="geo.region" content="AR-X" />
         <meta name="geo.placename" content="Alta Gracia, Córdoba" />
         <meta name="geo.position" content="-31.652966;-64.428268" />
         <meta name="ICBM" content="-31.652966, -64.428268" />
+        {/* Google Analytics */}
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-5VRL83D8BV"
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-5VRL83D8BV');
+            `,
+          }}
+        />
       </head>
       <body className={`${audiowide.variable} antialiased`}>
         <Providers>

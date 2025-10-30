@@ -1,0 +1,29 @@
+User-agent: *
+Allow: /
+
+# Evitar que bots accedan a áreas administrativas o sin contenido
+Disallow: /admin/
+Disallow: /private/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /node_modules/
+
+# Permitir acceso a recursos importantes
+Allow: /css/
+Allow: /js/
+Allow: /images/
+
+# Sitemap - ¡IMPORTANTE para SEO!
+Sitemap: https://scotto-inmobiliaria.com/sitemap.xml
+
+# Instrucciones específicas para bots conocidos
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+
+User-agent: GPTBot
+Disallow: /
