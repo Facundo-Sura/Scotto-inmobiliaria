@@ -31,7 +31,7 @@ Disallow: /*/edit/
 Disallow: /*/delete/
 
 # Sitemap - ¡CRÍTICO para SEO!
-Sitemap: https://scotto-inmobiliaria.com/sitemap.xml
+Sitemap: https://inmobiliariascotto.com.ar/sitemap.xml
 
 # Instrucciones específicas para bots principales
 User-agent: Googlebot
