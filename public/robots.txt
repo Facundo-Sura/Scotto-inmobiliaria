@@ -1,29 +1,60 @@
 User-agent: *
 Allow: /
 
-# Evitar que bots accedan a áreas administrativas o sin contenido
+# Áreas que NO queremos que indexen los motores de búsqueda
 Disallow: /admin/
-Disallow: /private/
 Disallow: /api/
+Disallow: /private/
 Disallow: /_next/
 Disallow: /node_modules/
+Disallow: /.git/
+Disallow: /*.json$
+Disallow: /*.js$
+Disallow: /*.css$
 
-# Permitir acceso a recursos importantes
-Allow: /css/
-Allow: /js/
+# Pero permitimos los recursos CSS y JS necesarios para el renderizado
+Allow: /_next/static/css/
+Allow: /_next/static/js/
+Allow: /_next/static/media/
+
+# Permitir acceso a imágenes y assets públicos
 Allow: /images/
+Allow: /img/
+Allow: /assets/
 
-# Sitemap - ¡IMPORTANTE para SEO!
+# Páginas que no aportan valor SEO (si las tienes)
+Disallow: /checkout/
+Disallow: /cart/
+Disallow: /user/
+Disallow: /profile/
+Disallow: /*/edit/
+Disallow: /*/delete/
+
+# Sitemap - ¡CRÍTICO para SEO!
 Sitemap: https://scotto-inmobiliaria.com/sitemap.xml
 
-# Instrucciones específicas para bots conocidos
+# Instrucciones específicas para bots principales
 User-agent: Googlebot
 Allow: /
-Disallow: /admin/
+Crawl-delay: 1
 
 User-agent: Bingbot
 Allow: /
-Disallow: /admin/
+Crawl-delay: 1
 
+User-agent: Yandex
+Allow: /
+Crawl-delay: 2
+
+# Bloquear bots no deseados/scrapers
 User-agent: GPTBot
 Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: FacebookBot
+Allow: /
